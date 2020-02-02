@@ -100,7 +100,7 @@ Token *tokenize() {
       continue;
     }
 
-    if (*p == '+' || *p == '-' || *p == '*' || *p == '/') {
+    if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')') {
       cur = new_token(TK_RESERVED, cur, p++);
       continue;
     }
@@ -137,14 +137,26 @@ Node *num() {
   return new_node_num(expect_number());
 }
 
+Node *expr();
+
+Node *primary() {
+  if (consume('(')) {
+    Node *node = expr();
+    expect(')');
+    return node;
+  }
+
+  return num();
+}
+
 Node *mul() {
-  Node *node = num();
+  Node *node = primary();
 
   for (;;) {
     if (consume('*'))
-      node = new_node(ND_MUL, node, num());
+      node = new_node(ND_MUL, node, primary());
     else if (consume('/'))
-      node = new_node(ND_DIV, node, num());
+      node = new_node(ND_DIV, node, primary());
     else
       return node;
   }
