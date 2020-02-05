@@ -27,6 +27,8 @@ typedef enum {
   ND_MUL,
   ND_DIV,
   ND_NUM,
+  ND_EQ,
+  ND_NEQ,
 } NodeKind;
 
 typedef struct Node Node;
@@ -111,6 +113,18 @@ Token *tokenize() {
       continue;
     }
 
+    if (*p == '=' && *(p+1) == '=') {
+      cur = new_token(TK_RESERVED, cur, p++, 2);
+      p++;
+      continue;
+    }
+
+    if (*p == '!' && *(p+1) == '=') {
+      cur = new_token(TK_RESERVED, cur, p++, 2);
+      p++;
+      continue;
+    }
+
     if (isdigit(*p)) {
       cur = new_token(TK_NUM, cur, p, 0);
       char *old_p = p;
@@ -178,7 +192,7 @@ Node *mul() {
   }
 }
 
-Node *expr() {
+Node *add() {
   Node *node = mul();
 
   for (;;) {
@@ -189,6 +203,23 @@ Node *expr() {
     else
       return node;
   }
+}
+
+Node *equality() {
+  Node *node = add();
+
+  for (;;) {
+    if (consume("=="))
+      node = new_node(ND_EQ, node, add());
+    else if (consume("!="))
+      node = new_node(ND_NEQ, node, add());
+    else
+      return node;
+  }
+}
+
+Node *expr() {
+  return equality();
 }
 
 void gen(Node *node) {
@@ -216,6 +247,16 @@ void gen(Node *node) {
     case ND_DIV:
       printf("  cqo\n");
       printf("  idiv rdi\n");
+      break;
+    case ND_EQ:
+      printf("  cmp rax, rdi\n");
+      printf("  sete al\n");
+      printf("  movzb rax, al\n");
+      break;
+    case ND_NEQ:
+      printf("  cmp rax, rdi\n");
+      printf("  setne al\n");
+      printf("  movzb rax, al\n");
       break;
   }
 
