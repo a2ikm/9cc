@@ -29,6 +29,8 @@ typedef enum {
   ND_NUM,
   ND_EQ,
   ND_NEQ,
+  ND_LT,
+  ND_LTEQ,
 } NodeKind;
 
 typedef struct Node Node;
@@ -125,6 +127,28 @@ Token *tokenize() {
       continue;
     }
 
+    if (*p == '<') {
+      if (*(p+1) == '=') {
+        cur = new_token(TK_RESERVED, cur, p++, 2);
+        p++;
+        continue;
+      } else {
+        cur = new_token(TK_RESERVED, cur, p++, 1);
+        continue;
+      }
+    }
+
+    if (*p == '>') {
+      if (*(p+1) == '=') {
+        cur = new_token(TK_RESERVED, cur, p++, 2);
+        p++;
+        continue;
+      } else {
+        cur = new_token(TK_RESERVED, cur, p++, 1);
+        continue;
+      }
+    }
+
     if (isdigit(*p)) {
       cur = new_token(TK_NUM, cur, p, 0);
       char *old_p = p;
@@ -205,14 +229,31 @@ Node *add() {
   }
 }
 
-Node *equality() {
+Node *relational() {
   Node *node = add();
 
   for (;;) {
+    if (consume("<"))
+      node = new_node(ND_LT, node, add());
+    else if (consume("<="))
+      node = new_node(ND_LTEQ, node, add());
+    else if (consume(">"))
+      node = new_node(ND_LT, add(), node);
+    else if (consume(">="))
+      node = new_node(ND_LTEQ, add(), node);
+    else
+      return node;
+  }
+}
+
+Node *equality() {
+  Node *node = relational();
+
+  for (;;) {
     if (consume("=="))
-      node = new_node(ND_EQ, node, add());
+      node = new_node(ND_EQ, node, relational());
     else if (consume("!="))
-      node = new_node(ND_NEQ, node, add());
+      node = new_node(ND_NEQ, node, relational());
     else
       return node;
   }
@@ -256,6 +297,16 @@ void gen(Node *node) {
     case ND_NEQ:
       printf("  cmp rax, rdi\n");
       printf("  setne al\n");
+      printf("  movzb rax, al\n");
+      break;
+    case ND_LT:
+      printf("  cmp rax, rdi\n");
+      printf("  setl al\n");
+      printf("  movzb rax, al\n");
+      break;
+    case ND_LTEQ:
+      printf("  cmp rax, rdi\n");
+      printf("  setle al\n");
       printf("  movzb rax, al\n");
       break;
   }
