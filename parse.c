@@ -22,6 +22,14 @@ bool consume(char *op) {
   return true;
 }
 
+Token *consume_ident() {
+  if (token->kind != TK_IDENT)
+    return NULL;
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 void expect(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
@@ -70,10 +78,15 @@ void tokenize() {
       continue;
     }
 
-    if (*p == '=' && *(p+1) == '=') {
-      cur = new_token(TK_RESERVED, cur, p++, 2);
-      p++;
-      continue;
+    if (*p == '=') {
+      if (*(p+1) == '=') {
+        cur = new_token(TK_RESERVED, cur, p++, 2);
+        p++;
+        continue;
+      } else {
+        cur = new_token(TK_RESERVED, cur, p++, 1);
+        continue;
+      }
     }
 
     if (*p == '!' && *(p+1) == '=') {
@@ -102,6 +115,11 @@ void tokenize() {
         cur = new_token(TK_RESERVED, cur, p++, 1);
         continue;
       }
+    }
+
+    if ('a' <= *p && *p <= 'z') {
+      cur = new_token(TK_IDENT, cur, p++, 1);
+      continue;
     }
 
     if (isdigit(*p)) {
@@ -144,6 +162,14 @@ Node *primary() {
   if (consume("(")) {
     Node *node = expr();
     expect(")");
+    return node;
+  }
+
+  Token *tok = consume_ident();
+  if (tok) {
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+    node->offset = (tok->str[0] - 'a' + 1) * sizeof(int);
     return node;
   }
 
@@ -214,8 +240,15 @@ Node *equality() {
   }
 }
 
+Node *assign() {
+  Node *node = equality();
+  if (consume("="))
+    node = new_node(ND_ASSIGN, node, assign());
+  return node;
+}
+
 Node *expr() {
-  return equality();
+  return assign();
 }
 
 Node *stmt() {

@@ -10,6 +10,7 @@
 
 typedef enum {
   TK_RESERVED,  // 記号
+  TK_IDENT,     // 識別子
   TK_NUM,       // 整数
   TK_EOF,       // EOF
 } TokenKind;
@@ -33,6 +34,8 @@ typedef enum {
   ND_NEQ,
   ND_LT,
   ND_LTEQ,
+  ND_ASSIGN,
+  ND_LVAR,
   ND_NUM,
 } NodeKind;
 
@@ -43,6 +46,7 @@ struct Node {
   Node *lhs;
   Node *rhs;
   int val;
+  int offset;
 };
 
 Token *token;
