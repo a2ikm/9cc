@@ -29,11 +29,11 @@ typedef enum {
   ND_SUB,
   ND_MUL,
   ND_DIV,
-  ND_NUM,
   ND_EQ,
   ND_NEQ,
   ND_LT,
   ND_LTEQ,
+  ND_NUM,
 } NodeKind;
 
 typedef struct Node Node;
