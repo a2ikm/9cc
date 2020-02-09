@@ -46,12 +46,13 @@ struct Node {
 };
 
 Token *token;
+Node *code[100];
 
 char *user_input;
 
 // parse.c
 Token *tokenize();
-Node *expr();
+Node *program();
 
 // codegen.c
 void gen(Node *node);
