@@ -51,8 +51,8 @@ Node *code[100];
 char *user_input;
 
 // parse.c
-Token *tokenize();
-Node *program();
+void tokenize();
+void program();
 
 // codegen.c
 void gen(Node *node);
