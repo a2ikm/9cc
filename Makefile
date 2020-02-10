@@ -13,4 +13,10 @@ test: 9cc
 clean:
 	rm -f 9cc *.o *~ tmp*
 
-.PHONY: test clean
+one: 9cc
+	./9cc "a = 42; a + 58;" > tmp.s
+	gcc -o tmp tmp.s
+	./tmp || true
+	echo Done
+
+.PHONY: test clean one
