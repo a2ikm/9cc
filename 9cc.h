@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define INT_SIZE 4
+#define INT_SIZE 8
 
 typedef enum {
   TK_RESERVED,  // 記号
