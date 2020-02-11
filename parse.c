@@ -336,3 +336,7 @@ void program() {
     code[i++] = stmt();
   code[i] = NULL;
 }
+
+void parse() {
+  program();
+}

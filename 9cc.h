@@ -60,7 +60,7 @@ char *user_input;
 
 // parse.c
 void tokenize();
-void program();
+void parse();
 
 // codegen.c
 void gen(Node *node);

@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
 
   user_input = argv[1];
   tokenize();
-  program();
+  parse();
 
   printf(".intel_syntax noprefix\n");
   printf(".global main\n");
