@@ -43,5 +43,7 @@ try 1 "4 + 5 > 2 + 3;"
 try 1 "0; 1;"
 try 8 "a = 3; a + 5;"
 try 3 "a = 5; z = -8; -z - a;"
+try 8 "foo = 3; foo + 5;"
+try 20 "foo = 12; bar = 8; foo + bar;"
 
 echo OK

@@ -1,5 +1,24 @@
 #include "9cc.h"
 
+typedef struct LVar LVar;
+
+struct LVar {
+  LVar *next;
+  char *name;
+  int len;
+  int offset;
+};
+
+LVar *locals;
+
+LVar *find_lvar(Token *tok) {
+  for (LVar *lvar = locals; lvar; lvar = lvar->next) {
+    if (lvar->len == tok->len && !memcmp(tok->str, lvar->name, lvar->len))
+      return lvar;
+  }
+  return NULL;
+}
+
 void error_at(char *loc, char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
@@ -57,6 +76,18 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   tok->len = len;
   cur->next = tok;
   return tok;
+}
+
+char *read_ident(char *p) {
+  if (isalpha(*p) || *p == '_') {
+    p++;
+    while (isalpha(*p) || isdigit(*p) || *p == '_') {
+      p++;
+    }
+    return p;
+  } else {
+    return NULL;
+  }
 }
 
 void tokenize() {
@@ -117,8 +148,10 @@ void tokenize() {
       }
     }
 
-    if ('a' <= *p && *p <= 'z') {
-      cur = new_token(TK_IDENT, cur, p++, 1);
+    if (isalpha(*p)) {
+      char *old_p = p;
+      p = read_ident(p);
+      cur = new_token(TK_IDENT, cur, old_p, p - old_p);
       continue;
     }
 
@@ -169,7 +202,23 @@ Node *primary() {
   if (tok) {
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
-    node->offset = (tok->str[0] - 'a' + 1) * INT_SIZE;
+
+    LVar *lvar = find_lvar(tok);
+    if (lvar) {
+      node->offset = lvar->offset;
+    } else {
+      lvar = calloc(1, sizeof(LVar));
+      lvar->next = locals;
+      lvar->name = tok->str;
+      lvar->len = tok->len;
+      if (locals)
+        lvar->offset = locals->offset + INT_SIZE;
+      else
+        lvar->offset = INT_SIZE;
+      locals = lvar;
+    }
+
+    node->offset = lvar->offset;
     return node;
   }
 
