@@ -41,12 +41,16 @@ bool consume(char *op) {
   return true;
 }
 
-Token *consume_ident() {
-  if (token->kind != TK_IDENT)
+Token *consume_kind(TokenKind kind) {
+  if (token->kind != kind)
     return NULL;
   Token *tok = token;
   token = token->next;
   return tok;
+}
+
+Token *consume_ident() {
+  return consume_kind(TK_IDENT);
 }
 
 void expect(char *op) {
@@ -88,6 +92,10 @@ char *read_ident(char *p) {
   } else {
     return NULL;
   }
+}
+
+bool is_alnum(char c) {
+  return isalpha(c) || isdigit(c) || c == '_';
 }
 
 void tokenize() {
@@ -146,6 +154,12 @@ void tokenize() {
         cur = new_token(TK_RESERVED, cur, p++, 1);
         continue;
       }
+    }
+
+    if (!strncmp(p, "return", 6) && !is_alnum(p[6])) {
+      cur = new_token(TK_RETURN, cur, p, 6);
+      p += 6;
+      continue;
     }
 
     if (isalpha(*p)) {
@@ -301,8 +315,18 @@ Node *expr() {
 }
 
 Node *stmt() {
-  Node *node = expr();
-  expect(";");
+  Node *node;
+
+  if (consume_kind(TK_RETURN)) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_RETURN;
+    node->lhs = expr();
+  } else {
+    node = expr();
+  }
+
+  if (!consume(";"))
+    error_at(token->str, "';'ではないトークンです");
   return node;
 }
 
