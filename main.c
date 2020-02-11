@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, %lu\n", ('z' - 'a' + 1) * sizeof(int));
+  printf("  sub rsp, %lu\n", ('z' - 'a' + 1) * INT_SIZE);
 
   for (int i = 0; code[i]; i++) {
     gen(code[i]);
