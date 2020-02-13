@@ -185,6 +185,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "for")) {
+      cur = new_token(TK_FOR, cur, p, 3);
+      p += 3;
+      continue;
+    }
+
     if (isalpha(*p)) {
       char *old_p = p;
       p = read_ident(p);
@@ -356,6 +362,18 @@ Node *stmt() {
     node->kind = ND_WHILE;
     expect("(");
     node->condition = expr();
+    expect(")");
+    node->consequence = stmt();
+    return node;
+  } else if (consume_kind(TK_FOR)) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_FOR;
+    expect("(");
+    node->initialization = expr();
+    expect(";");
+    node->condition = expr();
+    expect(";");
+    node->increment = expr();
     expect(")");
     node->consequence = stmt();
     return node;
