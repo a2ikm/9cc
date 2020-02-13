@@ -48,5 +48,7 @@ try 20 "foo = 12; bar = 8; foo + bar;"
 try 20 "10; return 20; 30;"
 try 10 "if (2 > 1) return 10; 20;"
 try 20 "if (2 < 1) return 10; 20;"
+try 10 "if (2 > 1) return 10; else return 20;"
+try 20 "if (2 < 1) return 10; else return 20;"
 
 echo OK

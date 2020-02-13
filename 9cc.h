@@ -14,6 +14,7 @@ typedef enum {
   TK_RESERVED,  // 記号
   TK_RETURN,    // "return"
   TK_IF,        // "if"
+  TK_ELSE,      // "else"
   TK_IDENT,     // 識別子
   TK_NUM,       // 整数
   TK_EOF,       // EOF
@@ -53,6 +54,7 @@ struct Node {
   Node *rhs;
   Node *condition;
   Node *consequence;
+  Node *alternative;
   int val;
   int offset;
 };

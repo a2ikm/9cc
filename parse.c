@@ -173,6 +173,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "else")) {
+      cur = new_token(TK_ELSE, cur, p, 4);
+      p += 4;
+      continue;
+    }
+
     if (isalpha(*p)) {
       char *old_p = p;
       p = read_ident(p);
@@ -336,6 +342,8 @@ Node *stmt() {
     node->condition = expr();
     expect(")");
     node->consequence = stmt();
+    if (consume_kind(TK_ELSE))
+      node->alternative = stmt();
     return node;
   }
 

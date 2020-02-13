@@ -44,12 +44,25 @@ void gen(Node *node) {
       return;
     case ND_IF:
       tmp_label_idx = label_idx++;
-      gen(node->condition);
-      printf("  pop rax\n");
-      printf("  cmp rax, 0\n");
-      printf("  je  .Lend%d\n", tmp_label_idx);
-      gen(node->consequence);
-      printf(".Lend%d:\n", tmp_label_idx);
+
+      if (node->alternative) {
+        gen(node->condition);
+        printf("  pop rax\n");
+        printf("  cmp rax, 0\n");
+        printf("  je  .Lelse%d\n", tmp_label_idx);
+        gen(node->consequence);
+        printf("  jmp .Lend%d\n", tmp_label_idx);
+        printf(".Lelse%d:\n", tmp_label_idx);
+        gen(node->alternative);
+        printf(".Lend%d:\n", tmp_label_idx);
+      } else {
+        gen(node->condition);
+        printf("  pop rax\n");
+        printf("  cmp rax, 0\n");
+        printf("  je  .Lend%d\n", tmp_label_idx);
+        gen(node->consequence);
+        printf(".Lend%d:\n", tmp_label_idx);
+      }
       return;
   }
 
