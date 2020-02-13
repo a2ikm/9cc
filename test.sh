@@ -50,5 +50,6 @@ try 10 "if (2 > 1) return 10; 20;"
 try 20 "if (2 < 1) return 10; 20;"
 try 10 "if (2 > 1) return 10; else return 20;"
 try 20 "if (2 < 1) return 10; else return 20;"
+try 5 "a = 0; while (a < 5) a = a + 1; a;"
 
 echo OK
