@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+unsigned int label_idx = 0;
+
 void gen_lval(Node *node) {
   if (node->kind != ND_LVAR) {
     fprintf(stderr, "代入の左辺値が変数ではありません\n");
@@ -12,6 +14,8 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
+  unsigned int tmp_label_idx;
+
   switch(node->kind) {
     case ND_NUM:
       printf("  push %d\n", node->val);
@@ -37,6 +41,15 @@ void gen(Node *node) {
       printf("  mov rsp, rbp\n");
       printf("  pop rbp\n");
       printf("  ret\n");
+      return;
+    case ND_IF:
+      tmp_label_idx = label_idx++;
+      gen(node->condition);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je  .Lend%d\n", tmp_label_idx);
+      gen(node->consequence);
+      printf(".Lend%d:\n", tmp_label_idx);
       return;
   }
 

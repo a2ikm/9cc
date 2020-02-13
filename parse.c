@@ -167,6 +167,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "if")) {
+      cur = new_token(TK_IF, cur, p, 2);
+      p += 2;
+      continue;
+    }
+
     if (isalpha(*p)) {
       char *old_p = p;
       p = read_ident(p);
@@ -321,6 +327,17 @@ Node *expr() {
 
 Node *stmt() {
   Node *node;
+
+  // end with stmt
+  if (consume_kind(TK_IF)) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_IF;
+    expect("(");
+    node->condition = expr();
+    expect(")");
+    node->consequence = stmt();
+    return node;
+  }
 
   if (consume_kind(TK_RETURN)) {
     node = calloc(1, sizeof(Node));
