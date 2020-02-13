@@ -98,6 +98,11 @@ bool is_alnum(char c) {
   return isalpha(c) || isdigit(c) || c == '_';
 }
 
+bool match(char *p, char *kwd) {
+  int len = strlen(kwd);
+  return (!strncmp(p, kwd, len) && !is_alnum(p[len]));
+}
+
 void tokenize() {
   char *p = user_input;
 
@@ -156,7 +161,7 @@ void tokenize() {
       }
     }
 
-    if (!strncmp(p, "return", 6) && !is_alnum(p[6])) {
+    if (match(p, "return")) {
       cur = new_token(TK_RETURN, cur, p, 6);
       p += 6;
       continue;
