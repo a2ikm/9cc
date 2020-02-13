@@ -355,8 +355,7 @@ Node *stmt() {
     node = expr();
   }
 
-  if (!consume(";"))
-    error_at(token->str, "';'ではないトークンです");
+  expect(";");
   return node;
 }
 
