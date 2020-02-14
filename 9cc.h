@@ -10,6 +10,17 @@
 
 #define INT_SIZE 8
 
+typedef struct {
+  void **data;
+  int len;
+  int size;
+} Vector;
+
+Vector *vec_new();
+void vec_add(Vector *vec, void *item);
+int vec_len(Vector *vec);
+void *vec_get(Vector *vec, int idx);
+
 typedef enum {
   TK_RESERVED,  // 記号
   TK_RETURN,    // "return"
@@ -48,6 +59,7 @@ typedef enum {
   ND_IF,
   ND_WHILE,
   ND_FOR,
+  ND_BLOCK,
 } NodeKind;
 
 typedef struct Node Node;
@@ -56,7 +68,7 @@ struct Node {
   NodeKind kind;
   Node *lhs;
   Node *rhs;
-
+  Vector *stmts;
 
   // if (<condition>) <consequence> else <alternative>
   // while (<condition>) <consequence>

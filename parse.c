@@ -117,7 +117,8 @@ void tokenize() {
     }
 
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' ||
-        *p == '(' || *p == ')' || *p == ';') {
+        *p == '(' || *p == ')' || *p == '{' || *p == '}' ||
+        *p == ';') {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -376,6 +377,16 @@ Node *stmt() {
     node->increment = expr();
     expect(")");
     node->consequence = stmt();
+    return node;
+  } else if (consume("{")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK;
+    node->stmts = vec_new();
+    while (!at_eof()) {
+      if (consume("}"))
+        break;
+      vec_add(node->stmts, (void *)stmt());
+    }
     return node;
   }
 

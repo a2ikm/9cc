@@ -88,6 +88,13 @@ void gen(Node *node) {
       printf("  jmp .Lbegin%d\n", tmp_label_idx);
       printf(".Lend%d:\n", tmp_label_idx);
       return;
+    case ND_BLOCK:
+      for (int i = 0; i < vec_len(node->stmts); i++) {
+        gen((Node *)vec_get(node->stmts, i));
+        printf("  pop rax\n");
+      }
+      printf("  push rax\n");
+      return;
   }
 
   gen(node->lhs);
