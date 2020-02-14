@@ -77,5 +77,6 @@ try_foo() {
 try_foo "foo();"
 try_foo "10; foo();"
 try_foo "a = 10; foo();"
+try_foo "foo(); a = 10;"
 
 echo OK

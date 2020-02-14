@@ -96,7 +96,20 @@ void gen(Node *node) {
       printf("  push rax\n");
       return;
     case ND_CALL:
+      tmp_label_idx = label_idx++;
+      printf("  mov rax, rsp\n");
+      printf("  mov rdi, 16\n");
+      printf("  cqo\n");
+      printf("  idiv rax, rdi\n");
+      printf("  cmp rdx, 8\n");
+      printf("  je  .Lpad%d\n", tmp_label_idx);
       printf("  call %s\n", node->fname);
+      printf("  jmp .Lend%d\n", tmp_label_idx);
+      printf(".Lpad%d:\n", tmp_label_idx);
+      printf("  sub rsp, 8\n");
+      printf("  call %s\n", node->fname);
+      printf("  add rsp, 8\n");
+      printf(".Lend%d:\n", tmp_label_idx);
       return;
   }
 
