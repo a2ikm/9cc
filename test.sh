@@ -57,4 +57,25 @@ try 5 "a = 0; while (a < 5) { a = a + 1; } a;"
 try 10 "a = 0; for (k = 0; k < 5; k = k + 1) { a = a + 2; } a;"
 try 20 "i = 0; a = 0; while (i < 5) { a = a + i * 2; i = i + 1; } a;"
 
+try_foo() {
+  input="$1"
+
+  gcc -c -o test/foo.o test/foo.c
+  ./9cc "$input" > tmp.s
+  gcc -c tmp.s
+  gcc -o tmp test/foo.o tmp.o
+  actual=$(./tmp)
+  expected=OK
+  if [ "$actual" = "$expected" ]; then
+    echo "$input => $actual"
+  else
+    echo "$input => $expected expected, but got $actual"
+    exit 1
+  fi
+}
+
+try_foo "foo();"
+try_foo "10; foo();"
+try_foo "a = 10; foo();"
+
 echo OK

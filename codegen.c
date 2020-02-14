@@ -95,6 +95,9 @@ void gen(Node *node) {
       }
       printf("  push rax\n");
       return;
+    case ND_CALL:
+      printf("  call %s\n", node->fname);
+      return;
   }
 
   gen(node->lhs);

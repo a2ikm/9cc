@@ -244,26 +244,36 @@ Node *primary() {
 
   Token *tok = consume_ident();
   if (tok) {
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_LVAR;
-
-    LVar *lvar = find_lvar(tok);
-    if (lvar) {
-      node->offset = lvar->offset;
+    if (consume("(")) {
+      Node *node = calloc(1, sizeof(Node));
+      node->kind = ND_CALL;
+      node->fname = malloc(sizeof(char) * (tok->len + 1));
+      strncpy(node->fname, tok->str, tok->len + 1);
+      node->fname[tok->len] = '\0';
+      expect(")");
+      return node;
     } else {
-      lvar = calloc(1, sizeof(LVar));
-      lvar->next = locals;
-      lvar->name = tok->str;
-      lvar->len = tok->len;
-      if (locals)
-        lvar->offset = locals->offset + INT_SIZE;
-      else
-        lvar->offset = INT_SIZE;
-      locals = lvar;
-    }
+      Node *node = calloc(1, sizeof(Node));
+      node->kind = ND_LVAR;
 
-    node->offset = lvar->offset;
-    return node;
+      LVar *lvar = find_lvar(tok);
+      if (lvar) {
+        node->offset = lvar->offset;
+      } else {
+        lvar = calloc(1, sizeof(LVar));
+        lvar->next = locals;
+        lvar->name = tok->str;
+        lvar->len = tok->len;
+        if (locals)
+          lvar->offset = locals->offset + INT_SIZE;
+        else
+          lvar->offset = INT_SIZE;
+        locals = lvar;
+      }
+
+      node->offset = lvar->offset;
+      return node;
+    }
   }
 
   return num();
