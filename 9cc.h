@@ -10,6 +10,8 @@
 
 #define INT_SIZE 8
 
+void error_at(char *loc, char *fmt, ...);
+
 typedef struct {
   void **data;
   int len;
