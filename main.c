@@ -11,20 +11,10 @@ int main(int argc, char **argv) {
   parse();
 
   printf(".intel_syntax noprefix\n");
-  printf(".global main\n");
-  printf("main:\n");
-
-  printf("  push rbp\n");
-  printf("  mov rbp, rsp\n");
-  printf("  sub rsp, %lu\n", ('z' - 'a' + 1) * INT_SIZE);
 
   for (int i = 0; code[i]; i++) {
     gen(code[i]);
-    printf("  pop rax\n");
   }
 
-  printf("  mov rsp, rbp\n");
-  printf("  pop rbp\n");
-  printf("  ret\n");
   return 0;
 }

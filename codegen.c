@@ -111,6 +111,19 @@ void gen(Node *node) {
       printf("  add rsp, 8\n");
       printf(".Lend%d:\n", tmp_label_idx);
       return;
+    case ND_FUNC:
+      printf(".global %s\n", node->fname);
+      printf("%s:\n", node->fname);
+      printf("  push rbp\n");
+      printf("  mov rbp, rsp\n");
+      printf("  sub rsp, %lu\n", ('z' - 'a' + 1) * INT_SIZE);
+      for (int i = 0; i < vec_len(node->stmts); i++) {
+        gen((Node *)vec_get(node->stmts, i));
+        printf("  pop rax\n");
+      }
+      printf("  mov rsp, rbp\n");
+      printf("  pop rbp\n");
+      return;
   }
 
   gen(node->lhs);

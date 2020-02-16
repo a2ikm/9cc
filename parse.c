@@ -69,6 +69,14 @@ int expect_number() {
   return val;
 }
 
+Token *expect_kind(TokenKind kind) {
+  if (token->kind != kind)
+    error_at(token->str, "kindが異なります");
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 bool at_eof() {
   return token->kind == TK_EOF;
 }
@@ -248,7 +256,7 @@ Node *primary() {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_CALL;
       node->fname = malloc(sizeof(char) * (tok->len + 1));
-      strncpy(node->fname, tok->str, tok->len + 1);
+      strncpy(node->fname, tok->str, tok->len);
       node->fname[tok->len] = '\0';
       expect(")");
       return node;
@@ -412,10 +420,29 @@ Node *stmt() {
   return node;
 }
 
+Node *func() {
+  Token *tok = expect_kind(TK_IDENT);
+  expect("(");
+  expect(")");
+  expect("{");
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_FUNC;
+  node->fname = malloc(sizeof(char) * (tok->len + 1));
+  strncpy(node->fname, tok->str, tok->len);
+  node->fname[tok->len] = '\0';
+  node->stmts = vec_new();
+  while (!at_eof()) {
+    if (consume("}"))
+      break;
+    vec_add(node->stmts, (void *)stmt());
+  }
+  return node;
+}
+
 void program() {
   int i = 0;
   while (!at_eof())
-    code[i++] = stmt();
+    code[i++] = func();
   code[i] = NULL;
 }
 
