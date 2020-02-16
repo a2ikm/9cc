@@ -120,8 +120,6 @@ void gen(Node *node) {
         gen((Node *)vec_get(node->stmts, i));
         printf("  pop rax\n");
       }
-      printf("  mov rsp, rbp\n");
-      printf("  pop rbp\n");
       return;
   }
 
