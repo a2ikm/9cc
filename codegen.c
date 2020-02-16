@@ -93,6 +93,7 @@ void gen(Node *node) {
         gen((Node *)vec_get(node->stmts, i));
         printf("  pop rax\n");
       }
+      printf("  push rax\n");
       return;
     case ND_CALL:
       tmp_label_idx = label_idx++;
