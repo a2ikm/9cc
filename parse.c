@@ -1,14 +1,5 @@
 #include "9cc.h"
 
-typedef struct LVar LVar;
-
-struct LVar {
-  LVar *next;
-  char *name;
-  int len;
-  int offset;
-};
-
 LVar *locals;
 
 LVar *find_lvar(Token *tok) {
@@ -277,11 +268,13 @@ Node *func() {
   strncpy(node->fname, tok->str, tok->len);
   node->fname[tok->len] = '\0';
   node->stmts = vec_new();
+  locals = node->locals = NULL;
   while (!at_eof()) {
     if (consume("}"))
       break;
     vec_add(node->stmts, (void *)stmt());
   }
+  node->locals = locals;
   return node;
 }
 

@@ -45,6 +45,15 @@ struct Token {
   int len;
 };
 
+typedef struct LVar LVar;
+
+struct LVar {
+  LVar *next;
+  char *name;
+  int len;
+  int offset;
+};
+
 typedef enum {
   ND_ADD,
   ND_SUB,
@@ -87,6 +96,7 @@ struct Node {
   int offset;
 
   char *fname;
+  LVar *locals;
 };
 
 Token *token;
