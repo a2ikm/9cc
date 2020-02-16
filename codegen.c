@@ -109,6 +109,7 @@ void gen(Node *node) {
       printf("  call %s\n", node->fname);
       printf("  add rsp, 8\n");
       printf(".Lend%d:\n", tmp_label_idx);
+      printf("  push rax\n");
       return;
     case ND_FUNC:
       printf(".global %s\n", node->fname);

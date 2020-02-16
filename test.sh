@@ -56,6 +56,9 @@ try 10 "main() { if (2 > 1)  { return 10; } return 20; }"
 try 5 "main() { a = 0; while (a < 5) { a = a + 1; } return a; }"
 try 10 "main() { a = 0; for (k = 0; k < 5; k = k + 1) { a = a + 2; } return a; }"
 try 20 "main() { i = 0; a = 0; while (i < 5) { a = a + i * 2; i = i + 1; } return a; }"
+try 10 "a() { return 10; } main() { b = a(); return b; }"
+try 10 "a() { return 10; } main() { return a(); }"
+try 3 "a() { return 1; } b() { return 2; } main() { return a() + b(); }"
 
 try_foo() {
   input="$1"
@@ -74,9 +77,9 @@ try_foo() {
   fi
 }
 
-try_foo "main() { foo(); }"
-try_foo "main() { 10; foo(); }"
-try_foo "main() { a = 10; foo(); }"
-try_foo "main() { foo(); a = 10; }"
+try_foo "main() { foo(); return 0; }"
+try_foo "main() { 10; foo(); return 0; }"
+try_foo "main() { a = 10; foo(); return 0; }"
+try_foo "main() { foo(); a = 10; return 0; }"
 
 echo OK
