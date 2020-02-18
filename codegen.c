@@ -99,9 +99,9 @@ void gen(Node *node) {
     case ND_CALL:
       tmp_label_idx = label_idx++;
       printf("  mov rax, rsp\n");
-      printf("  mov rdi, 16\n");
+      printf("  mov r11, 16\n");
       printf("  cqo\n");
-      printf("  idiv rax, rdi\n");
+      printf("  idiv rax, r11\n");
       printf("  cmp rdx, 8\n");
       printf("  je  .Lpad%d\n", tmp_label_idx);
       printf("  call %s\n", node->fname);
