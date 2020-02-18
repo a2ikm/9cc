@@ -60,6 +60,13 @@ try 10 "a() { return 10; } main() { b = a(); return b; }"
 try 10 "a() { return 10; } main() { return a(); }"
 try 3 "a() { return 1; } b() { return 2; } main() { return a() + b(); }"
 try 1 "a(x) { return 1; } main() { return a(); }"
+try 1 "a(x) { return x; } main() { return a(1); }"
+try 3 "a(x) { return x; } main() { return a(1+2); }"
+try 3 "a(x) { return x + 2; } main() { return a(1); }"
+try 8 "fb(x) { if (x == 0) { return 1; } else if (x == 1) { return 1; } else { return fb(x-2) + fb(x-1); } } main() { return fb(5); }"
+try 3 "a(x, y) { return x + y; } main() { return a(1, 2); }"
+#try 7 "a(x, y, z) { return x + y + z; } main() { return a(1, 2, 4); }"
+#try 9 "a(x, y, z) { return x + y * z; } main() { return a(1, 2, 4); }"
 
 try_foo() {
   input="$1"

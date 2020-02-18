@@ -116,7 +116,17 @@ Node *primary() {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_CALL;
       node->fname = token_copy_string(tok);
-      expect(")");
+      node->args = vec_new();
+
+      // parse args
+      while (!consume(")")) {
+        vec_add(node->args, expr());
+        if (consume(","))
+          continue;
+        expect(")");
+        break;
+      }
+
       return node;
     } else {
       Node *node = calloc(1, sizeof(Node));
@@ -277,7 +287,7 @@ Node *func() {
   // parse params
   while (!consume(")")) {
     tok = expect_kind(TK_IDENT);
-    vec_add(node->params, token_copy_string(tok));
+    vec_add(node->params, new_lvar(tok));
     if (consume(","))
       continue;
     expect(")");

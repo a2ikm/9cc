@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+char *regs[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
+
 unsigned int label_idx = 0;
 
 void gen_lval(Node *node) {
@@ -97,6 +99,12 @@ void gen(Node *node) {
       printf("  push rax\n");
       return;
     case ND_CALL:
+      for (int i = 0; i < vec_len(node->args); i++)
+        gen((Node *)vec_get(node->args, i));
+
+      for (int i = vec_len(node->args) - 1; i >= 0; i--)
+        printf("  pop %s\n", regs[i]);
+
       tmp_label_idx = label_idx++;
       printf("  mov rax, rsp\n");
       printf("  mov r11, 16\n");
@@ -114,12 +122,17 @@ void gen(Node *node) {
       printf("  push rax\n");
       return;
     case ND_FUNC:
-      frame_size = vec_len(node->lvars) * INT_SIZE;
       printf(".global %s\n", node->fname);
       printf("%s:\n", node->fname);
       printf("  push rbp\n");
       printf("  mov rbp, rsp\n");
+
+      for (int i = 0; i < vec_len(node->params); i++)
+        printf("  push %s\n", regs[i]);
+
+      frame_size = (vec_len(node->lvars) - vec_len(node->params)) * INT_SIZE;
       printf("  sub rsp, %d\n", frame_size);
+
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
         printf("  pop rax\n");
