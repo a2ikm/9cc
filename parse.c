@@ -92,9 +92,7 @@ Node *primary() {
     if (consume("(")) {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_CALL;
-      node->fname = malloc(sizeof(char) * (tok->len + 1));
-      strncpy(node->fname, tok->str, tok->len);
-      node->fname[tok->len] = '\0';
+      node->fname = token_copy_string(tok);
       expect(")");
       return node;
     } else {
@@ -264,9 +262,7 @@ Node *func() {
   expect("{");
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_FUNC;
-  node->fname = malloc(sizeof(char) * (tok->len + 1));
-  strncpy(node->fname, tok->str, tok->len);
-  node->fname[tok->len] = '\0';
+  node->fname = token_copy_string(tok);
   node->stmts = vec_new();
   locals = node->locals = NULL;
   while (!at_eof()) {

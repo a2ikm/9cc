@@ -104,8 +104,11 @@ Node *code[100];
 
 char *user_input;
 
-// parse.c
+// tokenize.c
 void tokenize();
+char *token_copy_string();
+
+// parse.c
 void parse();
 
 // codegen.c

@@ -9,6 +9,13 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   return tok;
 }
 
+char *token_copy_string(Token *token) {
+  char *dest = malloc(sizeof(char) * (token->len + 1));
+  strncpy(dest, token->str, token->len);
+  dest[token->len] = '\0';
+  return dest;
+}
+
 char *read_ident(char *p) {
   if (isalpha(*p) || *p == '_') {
     p++;
