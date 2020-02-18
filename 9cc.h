@@ -96,6 +96,7 @@ struct Node {
   int offset;
 
   char *fname;
+  Vector *params;
   LVar *locals;
 };
 

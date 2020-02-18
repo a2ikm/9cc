@@ -264,13 +264,24 @@ Node *stmt() {
 Node *func() {
   Token *tok = expect_kind(TK_IDENT);
   expect("(");
-  expect(")");
-  expect("{");
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_FUNC;
   node->fname = token_copy_string(tok);
+  node->params = vec_new();
   node->stmts = vec_new();
   locals = node->locals = NULL;
+
+  // parse params
+  while (!consume(")")) {
+    tok = expect_kind(TK_IDENT);
+    vec_add(node->params, token_copy_string(tok));
+    if (consume(","))
+      continue;
+    expect(")");
+    break;
+  }
+
+  expect("{");
   while (!at_eof()) {
     if (consume("}"))
       break;

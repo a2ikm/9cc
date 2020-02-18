@@ -59,6 +59,7 @@ try 20 "main() { i = 0; a = 0; while (i < 5) { a = a + i * 2; i = i + 1; } retur
 try 10 "a() { return 10; } main() { b = a(); return b; }"
 try 10 "a() { return 10; } main() { return a(); }"
 try 3 "a() { return 1; } b() { return 2; } main() { return a() + b(); }"
+try 1 "a(x) { return 1; } main() { return a(); }"
 
 try_foo() {
   input="$1"
