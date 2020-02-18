@@ -10,6 +10,26 @@ LVar *find_lvar(Token *tok) {
   return NULL;
 }
 
+LVar *new_lvar(Token *tok) {
+  LVar *lvar = calloc(1, sizeof(LVar));
+  lvar->next = locals;
+  lvar->name = tok->str;
+  lvar->len = tok->len;
+  if (locals)
+    lvar->offset = locals->offset + INT_SIZE;
+  else
+    lvar->offset = INT_SIZE;
+  locals = lvar;
+  return lvar;
+}
+
+LVar *find_or_new_lvar(Token *tok) {
+  LVar *lvar = find_lvar(tok);
+  if (!lvar)
+    lvar = new_lvar(tok);
+  return lvar;
+}
+
 bool consume(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
@@ -99,21 +119,7 @@ Node *primary() {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_LVAR;
 
-      LVar *lvar = find_lvar(tok);
-      if (lvar) {
-        node->offset = lvar->offset;
-      } else {
-        lvar = calloc(1, sizeof(LVar));
-        lvar->next = locals;
-        lvar->name = tok->str;
-        lvar->len = tok->len;
-        if (locals)
-          lvar->offset = locals->offset + INT_SIZE;
-        else
-          lvar->offset = INT_SIZE;
-        locals = lvar;
-      }
-
+      LVar *lvar = find_or_new_lvar(tok);
       node->offset = lvar->offset;
       return node;
     }
