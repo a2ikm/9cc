@@ -114,9 +114,7 @@ void gen(Node *node) {
       printf("  push rax\n");
       return;
     case ND_FUNC:
-      for (LVar *lvar = node->locals; lvar; lvar = lvar->next) {
-        frame_size += INT_SIZE;
-      }
+      frame_size = vec_len(node->lvars) * INT_SIZE;
       printf(".global %s\n", node->fname);
       printf("%s:\n", node->fname);
       printf("  push rbp\n");

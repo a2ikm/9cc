@@ -27,3 +27,10 @@ int vec_len(Vector *vec) {
 void *vec_get(Vector *vec, int idx) {
   return vec->data[idx];
 }
+
+void *vec_last(Vector *vec) {
+  if (vec->len > 0)
+    return vec->data[vec->len-1];
+  else
+    return NULL;
+}

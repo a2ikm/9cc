@@ -22,6 +22,7 @@ Vector *vec_new();
 void vec_add(Vector *vec, void *item);
 int vec_len(Vector *vec);
 void *vec_get(Vector *vec, int idx);
+void *vec_last(Vector *vec);
 
 typedef enum {
   TK_RESERVED,  // 記号
@@ -48,7 +49,6 @@ struct Token {
 typedef struct LVar LVar;
 
 struct LVar {
-  LVar *next;
   char *name;
   int len;
   int offset;
@@ -97,7 +97,7 @@ struct Node {
 
   char *fname;
   Vector *params;
-  LVar *locals;
+  Vector *lvars;
 };
 
 Token *token;

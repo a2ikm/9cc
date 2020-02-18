@@ -1,9 +1,10 @@
 #include "9cc.h"
 
-LVar *locals;
+Vector *lvars;
 
 LVar *find_lvar(Token *tok) {
-  for (LVar *lvar = locals; lvar; lvar = lvar->next) {
+  for (int i = 0; i < vec_len(lvars); i++) {
+    LVar *lvar = vec_get(lvars, i);
     if (lvar->len == tok->len && !memcmp(tok->str, lvar->name, lvar->len))
       return lvar;
   }
@@ -12,14 +13,16 @@ LVar *find_lvar(Token *tok) {
 
 LVar *new_lvar(Token *tok) {
   LVar *lvar = calloc(1, sizeof(LVar));
-  lvar->next = locals;
   lvar->name = tok->str;
   lvar->len = tok->len;
-  if (locals)
-    lvar->offset = locals->offset + INT_SIZE;
+
+  LVar *last = vec_last(lvars);
+  if (last)
+    lvar->offset = last->offset + INT_SIZE;
   else
     lvar->offset = INT_SIZE;
-  locals = lvar;
+
+  vec_add(lvars, lvar);
   return lvar;
 }
 
@@ -269,7 +272,7 @@ Node *func() {
   node->fname = token_copy_string(tok);
   node->params = vec_new();
   node->stmts = vec_new();
-  locals = node->locals = NULL;
+  lvars = node->lvars = vec_new();
 
   // parse params
   while (!consume(")")) {
@@ -287,7 +290,6 @@ Node *func() {
       break;
     vec_add(node->stmts, (void *)stmt());
   }
-  node->locals = locals;
   return node;
 }
 
