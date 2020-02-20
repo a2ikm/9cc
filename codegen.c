@@ -105,20 +105,11 @@ void gen(Node *node) {
       for (int i = vec_len(node->args) - 1; i >= 0; i--)
         printf("  pop %s\n", regs[i]);
 
-      tmp_label_idx = label_idx++;
-      printf("  mov rax, rsp\n");
-      printf("  mov r11, 16\n");
-      printf("  cqo\n");
-      printf("  idiv rax, r11\n");
-      printf("  cmp rdx, 8\n");
-      printf("  je  .Lpad%d\n", tmp_label_idx);
+      printf("  push rsp\n");
+      printf("  push [rsp]\n");
+      printf("  and rsp, -0x10\n");
       printf("  call %s\n", node->fname);
-      printf("  jmp .Lend%d\n", tmp_label_idx);
-      printf(".Lpad%d:\n", tmp_label_idx);
-      printf("  sub rsp, 8\n");
-      printf("  call %s\n", node->fname);
-      printf("  add rsp, 8\n");
-      printf(".Lend%d:\n", tmp_label_idx);
+      printf("  mov rsp, [rsp+8]\n");
       printf("  push rax\n");
       return;
     case ND_FUNC:
