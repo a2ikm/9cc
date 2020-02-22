@@ -5,8 +5,8 @@ char *regs[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
 unsigned int label_idx = 0;
 
 void gen_lval(Node *node) {
-  if (node->kind != ND_LVAR) {
-    fprintf(stderr, "代入の左辺値が変数ではありません\n");
+  if (node->kind != ND_LVAR && node->kind != ND_ADDR) {
+    fprintf(stderr, "代入の左辺値が変数かアドレスのどちらでもありません\n");
     exit(1);
   }
 
@@ -25,6 +25,15 @@ void gen(Node *node) {
       return;
     case ND_LVAR:
       gen_lval(node);
+      printf("  pop rax\n");
+      printf("  mov rax, [rax]\n");
+      printf("  push rax\n");
+      return;
+    case ND_ADDR:
+      gen_lval(node->lhs);
+      return;
+    case ND_DEREF:
+      gen(node->lhs);
       printf("  pop rax\n");
       printf("  mov rax, [rax]\n");
       printf("  push rax\n");
