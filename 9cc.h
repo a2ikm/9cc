@@ -47,6 +47,18 @@ struct Token {
   int len;
 };
 
+typedef enum {
+  TYPE_PTR,
+  TYPE_INT,
+} TypeKind;
+
+typedef struct Type Type;
+
+struct Type {
+  TypeKind kind;
+  struct Type *ptr_to;
+};
+
 typedef struct LVar LVar;
 
 struct LVar {
@@ -98,6 +110,7 @@ struct Node {
 
   int val;
   int offset;
+  Type *type;
 
   char *name;
   Vector *params;

@@ -279,11 +279,16 @@ Node *stmt() {
 
 Node *func() {
   expect_kind(TK_INT);
+  Type *type = malloc(sizeof(Type));
+  type->kind = TYPE_INT;
+  type->ptr_to = NULL;
+
   Token *tok = expect_kind(TK_IDENT);
   expect("(");
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_FUNC;
   node->name = token_copy_string(tok);
+  node->type = type;
   node->params = vec_new();
   node->stmts = vec_new();
   lvars = node->lvars = vec_new();
