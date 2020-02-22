@@ -138,6 +138,9 @@ void gen(Node *node) {
         printf("  pop rax\n");
       }
       return;
+    case ND_VAR_DECLARE:
+      printf("  push rax\n");
+      return;
   }
 
   gen(node->lhs);

@@ -126,6 +126,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "int")) {
+      cur = new_token(TK_INT, cur, p, 3);
+      p += 3;
+      continue;
+    }
+
     if (isalpha(*p)) {
       char *old_p = p;
       p = read_ident(p);

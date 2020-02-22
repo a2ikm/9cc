@@ -14,9 +14,9 @@ clean:
 	rm -f 9cc *.o *~ tmp*
 
 one: 9cc
-	./9cc "a = 42; a + 58;" > tmp.s
+	./9cc "int main() { int a; a = 42; return a; }" > tmp.s
 	gcc -o tmp tmp.s
-	./tmp || true
+	./tmp
 	echo Done
 
 .PHONY: test clean one

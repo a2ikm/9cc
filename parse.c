@@ -26,13 +26,6 @@ LVar *new_lvar(Token *tok) {
   return lvar;
 }
 
-LVar *find_or_new_lvar(Token *tok) {
-  LVar *lvar = find_lvar(tok);
-  if (!lvar)
-    lvar = new_lvar(tok);
-  return lvar;
-}
-
 bool consume(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
@@ -132,7 +125,7 @@ Node *primary() {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_LVAR;
 
-      LVar *lvar = find_or_new_lvar(tok);
+      LVar *lvar = find_lvar(tok);
       node->offset = lvar->offset;
       return node;
     }
@@ -270,6 +263,11 @@ Node *stmt() {
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
     node->lhs = expr();
+  } else if (consume_kind(TK_INT)) {
+    Token *tok = expect_kind(TK_IDENT);
+    new_lvar(tok);
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_VAR_DECLARE;
   } else {
     node = expr();
   }
@@ -279,6 +277,7 @@ Node *stmt() {
 }
 
 Node *func() {
+  expect_kind(TK_INT);
   Token *tok = expect_kind(TK_IDENT);
   expect("(");
   Node *node = calloc(1, sizeof(Node));
@@ -290,6 +289,7 @@ Node *func() {
 
   // parse params
   while (!consume(")")) {
+    expect_kind(TK_INT);
     tok = expect_kind(TK_IDENT);
     vec_add(node->params, new_lvar(tok));
     if (consume(","))
