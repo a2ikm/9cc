@@ -99,7 +99,7 @@ struct Node {
   int val;
   int offset;
 
-  char *fname;
+  char *name;
   Vector *params;
   Vector *args;
   Vector *lvars;

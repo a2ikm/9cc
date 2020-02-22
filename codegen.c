@@ -117,13 +117,13 @@ void gen(Node *node) {
       printf("  push rsp\n");
       printf("  push [rsp]\n");
       printf("  and rsp, -0x10\n");
-      printf("  call %s\n", node->fname);
+      printf("  call %s\n", node->name);
       printf("  mov rsp, [rsp+8]\n");
       printf("  push rax\n");
       return;
     case ND_FUNC:
-      printf(".global %s\n", node->fname);
-      printf("%s:\n", node->fname);
+      printf(".global %s\n", node->name);
+      printf("%s:\n", node->name);
       printf("  push rbp\n");
       printf("  mov rbp, rsp\n");
 

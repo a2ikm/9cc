@@ -108,7 +108,7 @@ Node *primary() {
     if (consume("(")) {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_CALL;
-      node->fname = token_copy_string(tok);
+      node->name = token_copy_string(tok);
       node->args = vec_new();
 
       // parse args
@@ -282,7 +282,7 @@ Node *func() {
   expect("(");
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_FUNC;
-  node->fname = token_copy_string(tok);
+  node->name = token_copy_string(tok);
   node->params = vec_new();
   node->stmts = vec_new();
   lvars = node->lvars = vec_new();
