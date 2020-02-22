@@ -5,7 +5,7 @@ char *regs[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
 unsigned int label_idx = 0;
 
 void gen_lval(Node *node) {
-  if (node->kind != ND_LVAR && node->kind != ND_ADDR) {
+  if (node->kind != ND_LVAR && node->kind != ND_ADDR && node->kind != ND_DEREF) {
     fprintf(stderr, "代入の左辺値が変数かアドレスのどちらでもありません\n");
     exit(1);
   }

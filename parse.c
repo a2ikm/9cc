@@ -27,6 +27,13 @@ LVar *new_lvar(Token *tok, Type *type) {
   return lvar;
 }
 
+Type *new_type(TypeKind kind) {
+  Type *type = malloc(sizeof(Type));
+  type->kind = kind;
+  type->ptr_to = NULL;
+  return type;
+}
+
 bool consume(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
@@ -258,36 +265,43 @@ Node *stmt() {
       vec_add(node->stmts, (void *)stmt());
     }
     return node;
-  }
-
-  if (consume_kind(TK_RETURN)) {
+  } else if (consume_kind(TK_RETURN)) {
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
     node->lhs = expr();
-  } else if (consume_kind(TK_INT)) {
-    Type *type = malloc(sizeof(Type));
-    type->kind = TYPE_INT;
-    type->ptr_to = NULL;
+    expect(";");
+    return node;
+  }
+
+  if (consume_kind(TK_INT)) {
+    Type *type = new_type(TYPE_INT);
+    while (!at_eof()) {
+      if (consume("*")) {
+        Type *ty = new_type(TYPE_PTR);
+        ty->ptr_to = type;
+        type = ty;
+        continue;
+      }
+      break;
+    }
     Token *tok = expect_kind(TK_IDENT);
     new_lvar(tok, type);
     node = calloc(1, sizeof(Node));
     node->kind = ND_VAR_DECLARE;
     node->name = token_copy_string(tok);
     node->type = type;
-  } else {
-    node = expr();
+    expect(";");
+    return node;
   }
 
+  node = expr();
   expect(";");
   return node;
 }
 
 Node *func() {
   expect_kind(TK_INT);
-  Type *type = malloc(sizeof(Type));
-  type->kind = TYPE_INT;
-  type->ptr_to = NULL;
-
+  Type *type = new_type(TYPE_INT);
   Token *tok = expect_kind(TK_IDENT);
   expect("(");
   Node *node = calloc(1, sizeof(Node));
@@ -301,9 +315,7 @@ Node *func() {
   // parse params
   while (!consume(")")) {
     expect_kind(TK_INT);
-    type = malloc(sizeof(Type));
-    type->kind = TYPE_INT;
-    type->ptr_to = NULL;
+    type = new_type(TYPE_INT);
     tok = expect_kind(TK_IDENT);
     vec_add(node->params, new_lvar(tok, type));
     if (consume(","))
