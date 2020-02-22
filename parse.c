@@ -11,10 +11,11 @@ LVar *find_lvar(Token *tok) {
   return NULL;
 }
 
-LVar *new_lvar(Token *tok) {
+LVar *new_lvar(Token *tok, Type *type) {
   LVar *lvar = calloc(1, sizeof(LVar));
   lvar->name = tok->str;
   lvar->len = tok->len;
+  lvar->type = type;
 
   LVar *last = vec_last(lvars);
   if (last)
@@ -264,11 +265,15 @@ Node *stmt() {
     node->kind = ND_RETURN;
     node->lhs = expr();
   } else if (consume_kind(TK_INT)) {
+    Type *type = malloc(sizeof(Type));
+    type->kind = TYPE_INT;
+    type->ptr_to = NULL;
     Token *tok = expect_kind(TK_IDENT);
-    new_lvar(tok);
+    new_lvar(tok, type);
     node = calloc(1, sizeof(Node));
     node->kind = ND_VAR_DECLARE;
     node->name = token_copy_string(tok);
+    node->type = type;
   } else {
     node = expr();
   }
@@ -296,8 +301,11 @@ Node *func() {
   // parse params
   while (!consume(")")) {
     expect_kind(TK_INT);
+    type = malloc(sizeof(Type));
+    type->kind = TYPE_INT;
+    type->ptr_to = NULL;
     tok = expect_kind(TK_IDENT);
-    vec_add(node->params, new_lvar(tok));
+    vec_add(node->params, new_lvar(tok, type));
     if (consume(","))
       continue;
     expect(")");

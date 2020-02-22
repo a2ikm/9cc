@@ -65,6 +65,7 @@ struct LVar {
   char *name;
   int len;
   int offset;
+  Type *type;
 };
 
 typedef enum {
