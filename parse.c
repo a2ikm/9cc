@@ -268,6 +268,7 @@ Node *stmt() {
     new_lvar(tok);
     node = calloc(1, sizeof(Node));
     node->kind = ND_VAR_DECLARE;
+    node->name = token_copy_string(tok);
   } else {
     node = expr();
   }
