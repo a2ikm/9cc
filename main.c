@@ -19,14 +19,16 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  funcs = vec_new();
+
   user_input = argv[1];
   tokenize();
   parse();
 
   printf(".intel_syntax noprefix\n");
 
-  for (int i = 0; code[i]; i++) {
-    gen(code[i]);
+  for (int i = 0; i < vec_len(funcs); i++) {
+    gen(vec_get(funcs, i));
   }
 
   return 0;

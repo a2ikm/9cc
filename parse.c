@@ -334,10 +334,8 @@ Node *func() {
 }
 
 void program() {
-  int i = 0;
   while (!at_eof())
-    code[i++] = func();
-  code[i] = NULL;
+    vec_add(funcs, func());
 }
 
 void parse() {

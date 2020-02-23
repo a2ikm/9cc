@@ -121,7 +121,7 @@ struct Node {
 };
 
 Token *token;
-Node *code[100];
+Vector *funcs;
 
 char *user_input;
 
