@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define INT_SIZE 8
+#define PTR_SIZE 8
+#define INT_SIZE 4
 
 void error_at(char *loc, char *fmt, ...);
 

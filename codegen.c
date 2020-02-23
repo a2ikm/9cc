@@ -118,7 +118,7 @@ void gen(Node *node) {
       printf("  push [rsp]\n");
       printf("  and rsp, -0x10\n");
       printf("  call %s\n", node->name);
-      printf("  mov rsp, [rsp+8]\n");
+      printf("  mov rsp, [rsp+%d]\n", PTR_SIZE);
       printf("  push rax\n");
       return;
     case ND_FUNC:
@@ -130,7 +130,7 @@ void gen(Node *node) {
       for (int i = 0; i < vec_len(node->params); i++)
         printf("  push %s\n", regs[i]);
 
-      frame_size = (vec_len(node->lvars) - vec_len(node->params)) * INT_SIZE;
+      frame_size = (vec_len(node->lvars) - vec_len(node->params)) * PTR_SIZE;
       printf("  sub rsp, %d\n", frame_size);
 
       for (int i = 0; i < vec_len(node->stmts); i++) {

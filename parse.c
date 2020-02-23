@@ -19,9 +19,9 @@ LVar *new_lvar(Token *tok, Type *type) {
 
   LVar *last = vec_last(lvars);
   if (last)
-    lvar->offset = last->offset + INT_SIZE;
+    lvar->offset = last->offset + PTR_SIZE;
   else
-    lvar->offset = INT_SIZE;
+    lvar->offset = PTR_SIZE;
 
   vec_add(lvars, lvar);
   return lvar;
