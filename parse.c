@@ -356,6 +356,14 @@ Node *stmt() {
 
 void func() {
   expect_kind(TK_INT);
+  Type *type = new_type_int();
+  while (!at_eof()) {
+    if (consume("*")) {
+      type = new_type_ptr_to(type);
+      continue;
+    }
+    break;
+  }
   Token *tok = expect_kind(TK_IDENT);
   expect("(");
 
@@ -363,22 +371,31 @@ void func() {
   if (!fn) {
     fn = calloc(1, sizeof(Function));
     fn->name = token_copy_string(tok);
-    fn->type = new_type_int();
+    fn->type = type;
     vec_add(funcs, fn);
   }
 
   // parse params
   Vector *params = vec_new();
   lvars = vec_new();
-  while (!consume(")")) {
-    expect_kind(TK_INT);
-    Type *type = new_type_int();
-    tok = expect_kind(TK_IDENT);
-    vec_add(params, new_lvar(tok, type));
-    if (consume(","))
-      continue;
+  if (!consume(")")) {
+    while (!at_eof()) {
+      expect_kind(TK_INT);
+      Type *type = new_type_int();
+      while (!at_eof()) {
+        if (consume("*")) {
+          type = new_type_ptr_to(type);
+          continue;
+        }
+        break;
+      }
+      tok = expect_kind(TK_IDENT);
+      vec_add(params, new_lvar(tok, type));
+      if (consume(","))
+        continue;
+      break;
+    }
     expect(")");
-    break;
   }
 
   if (consume(";"))
