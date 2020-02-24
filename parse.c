@@ -27,6 +27,15 @@ LVar *new_lvar(Token *tok, Type *type) {
   return lvar;
 }
 
+Function *find_func(Token *tok) {
+  for (int i = 0; i < vec_len(funcs); i++) {
+    Function *fn = vec_get(funcs, i);
+    if (!memcmp(tok->str, fn->name, tok->len))
+      return fn;
+  }
+  return NULL;
+}
+
 Type *new_type(TypeKind kind) {
   Type *type = malloc(sizeof(Type));
   type->kind = kind;
@@ -117,6 +126,7 @@ Node *primary() {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_CALL;
       node->name = token_copy_string(tok);
+      node->type = find_func(tok)->type;
       node->args = vec_new();
 
       // parse args
@@ -299,30 +309,44 @@ Node *stmt() {
   return node;
 }
 
-Node *func() {
+void func() {
   expect_kind(TK_INT);
-  Type *type = new_type(TYPE_INT);
   Token *tok = expect_kind(TK_IDENT);
   expect("(");
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = ND_FUNC;
-  node->name = token_copy_string(tok);
-  node->type = type;
-  node->params = vec_new();
-  node->stmts = vec_new();
-  lvars = node->lvars = vec_new();
+
+  Function *fn = find_func(tok);
+  if (!fn) {
+    fn = calloc(1, sizeof(Function));
+    fn->name = token_copy_string(tok);
+    fn->type = new_type(TYPE_INT);
+    vec_add(funcs, fn);
+  }
 
   // parse params
+  Vector *params = vec_new();
+  lvars = vec_new();
   while (!consume(")")) {
     expect_kind(TK_INT);
-    type = new_type(TYPE_INT);
+    Type *type = new_type(TYPE_INT);
     tok = expect_kind(TK_IDENT);
-    vec_add(node->params, new_lvar(tok, type));
+    vec_add(params, new_lvar(tok, type));
     if (consume(","))
       continue;
     expect(")");
     break;
   }
+
+  if (consume(";"))
+    return;
+
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_FUNC;
+  node->name = fn->name;
+  node->type = fn->type;
+  node->params = params;
+  node->stmts = vec_new();
+  node->lvars = lvars;
+  fn->node = node;
 
   expect("{");
   while (!at_eof()) {
@@ -330,12 +354,12 @@ Node *func() {
       break;
     vec_add(node->stmts, (void *)stmt());
   }
-  return node;
+  return;
 }
 
 void program() {
   while (!at_eof())
-    vec_add(funcs, func());
+    func();
 }
 
 void parse() {

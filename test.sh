@@ -88,9 +88,9 @@ try_foo() {
   fi
 }
 
-try_foo "int main() { foo(); return 0; }"
-try_foo "int main() { 10; foo(); return 0; }"
-try_foo "int main() { int a; a = 10; foo(); return 0; }"
-try_foo "int main() { int a; foo(); a = 10; return 0; }"
+try_foo "int foo(); int main() { foo(); return 0; }"
+try_foo "int foo(); int main() { 10; foo(); return 0; }"
+try_foo "int foo(); int main() { int a; a = 10; foo(); return 0; }"
+try_foo "int foo(); int main() { int a; foo(); a = 10; return 0; }"
 
 echo OK

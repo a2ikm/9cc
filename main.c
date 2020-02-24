@@ -28,7 +28,9 @@ int main(int argc, char **argv) {
   printf(".intel_syntax noprefix\n");
 
   for (int i = 0; i < vec_len(funcs); i++) {
-    gen(vec_get(funcs, i));
+    Function *fn = vec_get(funcs, i);
+    if (fn->node)
+      gen(fn->node);
   }
 
   return 0;

@@ -120,9 +120,15 @@ struct Node {
   Vector *lvars;
 };
 
-Token *token;
+typedef struct {
+  char *name;
+  Type *type;
+  Node *node;
+} Function;
+
 Vector *funcs;
 
+Token *token;
 char *user_input;
 
 // tokenize.c
