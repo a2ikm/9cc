@@ -43,6 +43,16 @@ Type *new_type(TypeKind kind) {
   return type;
 }
 
+Type *new_type_int() {
+  return new_type(TYPE_INT);
+}
+
+Type *new_type_ptr_to(Type *ptr_to) {
+  Type *type = new_type(TYPE_PTR);
+  type->ptr_to = ptr_to;
+  return type;
+}
+
 bool consume(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
@@ -104,6 +114,7 @@ Node *new_node_num(int val) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_NUM;
   node->val = val;
+  node->type = new_type_int();
   return node;
 }
 
@@ -145,6 +156,7 @@ Node *primary() {
 
       LVar *lvar = find_lvar(tok);
       node->offset = lvar->offset;
+      node->type = lvar->type;
       return node;
     }
   }
@@ -155,12 +167,21 @@ Node *primary() {
 Node *unary() {
   if (consume("+"))
     return primary();
-  if (consume("-"))
-    return new_node(ND_SUB, new_node_num(0), primary());
-  if (consume("*"))
-    return new_node(ND_DEREF, unary(), NULL);
-  if (consume("&"))
-    return new_node(ND_ADDR, unary(), NULL);
+  if (consume("-")) {
+    Node *node = new_node(ND_SUB, new_node_num(0), primary());
+    node->type = node->rhs->type;
+    return node;
+  }
+  if (consume("*")) {
+    Node *node = new_node(ND_DEREF, unary(), NULL);
+    node->type = node->lhs->type->ptr_to;
+    return node;
+  }
+  if (consume("&")) {
+    Node *node = new_node(ND_ADDR, unary(), NULL);
+    node->type = new_type_ptr_to(node->lhs->type);
+    return node;
+  }
   return primary();
 }
 
@@ -168,12 +189,15 @@ Node *mul() {
   Node *node = unary();
 
   for (;;) {
-    if (consume("*"))
+    if (consume("*")) {
       node = new_node(ND_MUL, node, unary());
-    else if (consume("/"))
+      node->type = node->lhs->type;
+    } else if (consume("/")) {
       node = new_node(ND_DIV, node, unary());
-    else
+      node->type = node->lhs->type;
+    } else {
       return node;
+    }
   }
 }
 
@@ -181,12 +205,25 @@ Node *add() {
   Node *node = mul();
 
   for (;;) {
-    if (consume("+"))
+    if (consume("+")) {
       node = new_node(ND_ADD, node, mul());
-    else if (consume("-"))
+      if (node->lhs->type->kind == TYPE_PTR)
+        node->type = node->lhs->type;
+      else if (node->rhs->type->kind == TYPE_PTR)
+        node->type = node->rhs->type;
+      else
+        node->type = node->lhs->type;
+    } else if (consume("-")) {
       node = new_node(ND_SUB, node, mul());
-    else
+      if (node->lhs->type->kind == TYPE_PTR)
+        node->type = node->lhs->type;
+      else if (node->rhs->type->kind == TYPE_PTR)
+        node->type = node->rhs->type;
+      else
+        node->type = node->lhs->type;
+    } else {
       return node;
+    }
   }
 }
 
@@ -194,16 +231,21 @@ Node *relational() {
   Node *node = add();
 
   for (;;) {
-    if (consume("<"))
+    if (consume("<")) {
       node = new_node(ND_LT, node, add());
-    else if (consume("<="))
+      node->type = new_type_int();
+    } else if (consume("<=")) {
+      node->type = new_type_int();
       node = new_node(ND_LTEQ, node, add());
-    else if (consume(">"))
+    } else if (consume(">")) {
+      node->type = new_type_int();
       node = new_node(ND_LT, add(), node);
-    else if (consume(">="))
+    } else if (consume(">=")) {
+      node->type = new_type_int();
       node = new_node(ND_LTEQ, add(), node);
-    else
+    } else {
       return node;
+    }
   }
 }
 
@@ -211,10 +253,13 @@ Node *equality() {
   Node *node = relational();
 
   for (;;) {
-    if (consume("=="))
+    if (consume("==")) {
       node = new_node(ND_EQ, node, relational());
-    else if (consume("!="))
+      node->type = new_type_int();
+    } else if (consume("!=")) {
       node = new_node(ND_NEQ, node, relational());
+      node->type = new_type_int();
+    }
     else
       return node;
   }
@@ -222,8 +267,10 @@ Node *equality() {
 
 Node *assign() {
   Node *node = equality();
-  if (consume("="))
+  if (consume("=")) {
     node = new_node(ND_ASSIGN, node, assign());
+    node->type = node->lhs->type;
+  }
   return node;
 }
 
@@ -284,12 +331,10 @@ Node *stmt() {
   }
 
   if (consume_kind(TK_INT)) {
-    Type *type = new_type(TYPE_INT);
+    Type *type = new_type_int();
     while (!at_eof()) {
       if (consume("*")) {
-        Type *ty = new_type(TYPE_PTR);
-        ty->ptr_to = type;
-        type = ty;
+        type = new_type_ptr_to(type);
         continue;
       }
       break;
@@ -318,7 +363,7 @@ void func() {
   if (!fn) {
     fn = calloc(1, sizeof(Function));
     fn->name = token_copy_string(tok);
-    fn->type = new_type(TYPE_INT);
+    fn->type = new_type_int();
     vec_add(funcs, fn);
   }
 
@@ -327,7 +372,7 @@ void func() {
   lvars = vec_new();
   while (!consume(")")) {
     expect_kind(TK_INT);
-    Type *type = new_type(TYPE_INT);
+    Type *type = new_type_int();
     tok = expect_kind(TK_IDENT);
     vec_add(params, new_lvar(tok, type));
     if (consume(","))
