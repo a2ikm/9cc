@@ -1,6 +1,7 @@
 #include "9cc.h"
 
-char *regs[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
+char *regs4[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
+char *regs8[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
 
 unsigned int label_idx = 0;
 
@@ -26,7 +27,10 @@ void gen(Node *node) {
     case ND_LVAR:
       gen_lval(node);
       printf("  pop rax\n");
-      printf("  mov rax, [rax]\n");
+      if (node->type->size == INT_SIZE)
+        printf("  movsxd rax, dword ptr [rax]\n");
+      else
+        printf("  mov rax, [rax]\n");
       printf("  push rax\n");
       return;
     case ND_ADDR:
@@ -35,7 +39,10 @@ void gen(Node *node) {
     case ND_DEREF:
       gen(node->lhs);
       printf("  pop rax\n");
-      printf("  mov rax, [rax]\n");
+      if (node->type->ptr_to->size == INT_SIZE)
+        printf("  movsxd rax, dword ptr [rax]\n");
+      else
+        printf("  mov rax, [rax]\n");
       printf("  push rax\n");
       return;
     case ND_ASSIGN:
@@ -44,7 +51,10 @@ void gen(Node *node) {
 
       printf("  pop rdi\n");
       printf("  pop rax\n");
-      printf("  mov [rax], rdi\n");
+      if (node->type->size == INT_SIZE)
+        printf("  mov [rax], edi\n");
+      else
+        printf("  mov [rax], rdi\n");
       printf("  push rdi\n");
       return;
     case ND_RETURN:
@@ -112,7 +122,7 @@ void gen(Node *node) {
         gen((Node *)vec_get(node->args, i));
 
       for (int i = vec_len(node->args) - 1; i >= 0; i--)
-        printf("  pop %s\n", regs[i]);
+        printf("  pop %s\n", regs8[i]);
 
       printf("  push rsp\n");
       printf("  push [rsp]\n");
@@ -127,11 +137,19 @@ void gen(Node *node) {
       printf("  push rbp\n");
       printf("  mov rbp, rsp\n");
 
-      for (int i = 0; i < vec_len(node->params); i++)
-        printf("  push %s\n", regs[i]);
+      size_t frame_size = 0;
+      for (int i = 0; i < vec_len(node->lvars); i++)
+        frame_size += ((LVar *)vec_get(node->lvars, i))->type->size;
+      if (frame_size > 0)
+        printf("  sub rsp, %ld\n", frame_size);
 
-      frame_size = (vec_len(node->lvars) - vec_len(node->params)) * PTR_SIZE;
-      printf("  sub rsp, %d\n", frame_size);
+      for (int i = 0; i < vec_len(node->params); i++) {
+        LVar *lvar = vec_get(node->params, i);
+        if (lvar->type->size == INT_SIZE)
+          printf("  mov [rbp-%d], %s\n", lvar->offset, regs4[i]);
+        else
+          printf("  mov [rbp-%d], %s\n", lvar->offset, regs8[i]);
+      }
 
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
