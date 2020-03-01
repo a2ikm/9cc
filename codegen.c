@@ -39,7 +39,7 @@ void gen(Node *node) {
     case ND_DEREF:
       gen(node->lhs);
       printf("  pop rax\n");
-      if (node->type->ptr_to->size == INT_SIZE)
+      if (node->type->size == INT_SIZE)
         printf("  movsxd rax, dword ptr [rax]\n");
       else
         printf("  mov rax, [rax]\n");
