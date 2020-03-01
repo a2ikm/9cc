@@ -159,6 +159,7 @@ Node *primary() {
 
       LVar *lvar = find_lvar(tok);
       node->offset = lvar->offset;
+      node->name = token_copy_string(tok);
       node->type = lvar->type;
       return node;
     }
