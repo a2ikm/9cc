@@ -1,5 +1,20 @@
 #include "9cc.h"
 
+void dump_type(Node *node) {
+  Type *type = node->type;
+  fprintf(stderr, "%s: ", node->name);
+  for (;type;) {
+    if (type->kind == TYPE_PTR) {
+      fprintf(stderr, "ptr->");
+      type = type->ptr_to;
+    } else if (type->kind == TYPE_INT) {
+      fprintf(stderr, "int\n");
+      return;
+    }
+  }
+  fprintf(stderr, "null\n");
+}
+
 Vector *lvars;
 
 LVar *find_lvar(Token *tok) {
@@ -19,9 +34,9 @@ LVar *new_lvar(Token *tok, Type *type) {
 
   LVar *last = vec_last(lvars);
   if (last)
-    lvar->offset = last->offset + PTR_SIZE;
+    lvar->offset = last->offset + lvar->type->size;
   else
-    lvar->offset = PTR_SIZE;
+    lvar->offset = lvar->type->size;
 
   vec_add(lvars, lvar);
   return lvar;
@@ -44,11 +59,14 @@ Type *new_type(TypeKind kind) {
 }
 
 Type *new_type_int() {
-  return new_type(TYPE_INT);
+  Type *type = new_type(TYPE_INT);
+  type->size = INT_SIZE;
+  return type;
 }
 
 Type *new_type_ptr_to(Type *ptr_to) {
   Type *type = new_type(TYPE_PTR);
+  type->size = PTR_SIZE;
   type->ptr_to = ptr_to;
   return type;
 }
@@ -156,6 +174,7 @@ Node *primary() {
 
       LVar *lvar = find_lvar(tok);
       node->offset = lvar->offset;
+      node->name = token_copy_string(tok);
       node->type = lvar->type;
       return node;
     }
