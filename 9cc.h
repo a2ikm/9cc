@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PTR_SIZE 8
+#define QWORD_SIZE 8
 #define DWORD_SIZE 4
 
 // helper.c

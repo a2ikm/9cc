@@ -66,7 +66,7 @@ Type *new_type_int() {
 
 Type *new_type_ptr_to(Type *ptr_to) {
   Type *type = new_type(TYPE_PTR);
-  type->size = PTR_SIZE;
+  type->size = QWORD_SIZE;
   type->ptr_to = ptr_to;
   return type;
 }
