@@ -136,6 +136,10 @@ Node *new_num(int val) {
   return node;
 }
 
+Node *new_unary(NodeKind kind, Node *expr) {
+  return new_node(kind, expr, NULL);
+}
+
 Node *num() {
   return new_num(expect_number());
 }
@@ -192,12 +196,12 @@ Node *unary() {
     return node;
   }
   if (consume("*")) {
-    Node *node = new_node(ND_DEREF, unary(), NULL);
+    Node *node = new_unary(ND_DEREF, unary());
     node->type = node->lhs->type->ptr_to;
     return node;
   }
   if (consume("&")) {
-    Node *node = new_node(ND_ADDR, unary(), NULL);
+    Node *node = new_unary(ND_ADDR, unary());
     node->type = new_type_ptr_to(node->lhs->type);
     return node;
   }
