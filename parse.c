@@ -120,24 +120,31 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
-Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
+Node *new_node(NodeKind kind) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
+  return node;
+}
+
+Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
+  Node *node = new_node(kind);
   node->lhs = lhs;
   node->rhs = rhs;
   return node;
 }
 
 Node *new_num(int val) {
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = ND_NUM;
+  Node *node = new_node(ND_NUM);
   node->val = val;
   node->type = new_type_int();
   return node;
 }
 
 Node *new_unary(NodeKind kind, Node *expr) {
-  return new_binary(kind, expr, NULL);
+  Node *node = new_node(kind);
+  node->lhs = expr;
+  node->rhs = NULL;
+  return node;
 }
 
 Node *num() {
@@ -156,8 +163,7 @@ Node *primary() {
   Token *tok = consume_ident();
   if (tok) {
     if (consume("(")) {
-      Node *node = calloc(1, sizeof(Node));
-      node->kind = ND_CALL;
+      Node *node = new_node(ND_CALL);
       node->name = strndup(tok->str, tok->len);
       node->type = find_func(tok)->type;
       node->args = vec_new();
@@ -173,8 +179,7 @@ Node *primary() {
 
       return node;
     } else {
-      Node *node = calloc(1, sizeof(Node));
-      node->kind = ND_LVAR;
+      Node *node = new_node(ND_LVAR);
 
       LVar *lvar = find_lvar(tok);
       node->offset = lvar->offset;
@@ -306,8 +311,7 @@ Node *stmt() {
 
   // end with stmt
   if (consume_kind(TK_IF)) {
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_IF;
+    Node *node = new_node(ND_IF);
     expect("(");
     node->condition = expr();
     expect(")");
@@ -316,16 +320,14 @@ Node *stmt() {
       node->alternative = stmt();
     return node;
   } else if (consume_kind(TK_WHILE)) {
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_WHILE;
+    Node *node = new_node(ND_WHILE);
     expect("(");
     node->condition = expr();
     expect(")");
     node->consequence = stmt();
     return node;
   } else if (consume_kind(TK_FOR)) {
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_FOR;
+    Node *node = new_node(ND_FOR);
     expect("(");
     node->initialization = expr();
     expect(";");
@@ -336,8 +338,7 @@ Node *stmt() {
     node->consequence = stmt();
     return node;
   } else if (consume("{")) {
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_BLOCK;
+    Node *node = new_node(ND_BLOCK);
     node->stmts = vec_new();
     while (!at_eof()) {
       if (consume("}"))
@@ -346,8 +347,7 @@ Node *stmt() {
     }
     return node;
   } else if (consume_kind(TK_RETURN)) {
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_RETURN;
+    Node *node = new_node(ND_RETURN);
     node->lhs = expr();
     expect(";");
     return node;
@@ -364,8 +364,7 @@ Node *stmt() {
     }
     Token *tok = expect_kind(TK_IDENT);
     new_lvar(tok, type);
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_VAR_DECLARE;
+    Node *node = new_node(ND_VAR_DECLARE);
     node->name = strndup(tok->str, tok->len);
     node->type = type;
     expect(";");
@@ -424,8 +423,7 @@ void func() {
   if (consume(";"))
     return;
 
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = ND_FUNC;
+  Node *node = new_node(ND_FUNC);
   node->name = fn->name;
   node->type = fn->type;
   node->params = params;
