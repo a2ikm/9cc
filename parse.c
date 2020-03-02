@@ -154,7 +154,7 @@ Node *primary() {
     if (consume("(")) {
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_CALL;
-      node->name = token_copy_string(tok);
+      node->name = strndup(tok->str, tok->len);
       node->type = find_func(tok)->type;
       node->args = vec_new();
 
@@ -174,7 +174,7 @@ Node *primary() {
 
       LVar *lvar = find_lvar(tok);
       node->offset = lvar->offset;
-      node->name = token_copy_string(tok);
+      node->name = strndup(tok->str, tok->len);
       node->type = lvar->type;
       return node;
     }
@@ -362,7 +362,7 @@ Node *stmt() {
     new_lvar(tok, type);
     node = calloc(1, sizeof(Node));
     node->kind = ND_VAR_DECLARE;
-    node->name = token_copy_string(tok);
+    node->name = strndup(tok->str, tok->len);
     node->type = type;
     expect(";");
     return node;
@@ -389,7 +389,7 @@ void func() {
   Function *fn = find_func(tok);
   if (!fn) {
     fn = calloc(1, sizeof(Function));
-    fn->name = token_copy_string(tok);
+    fn->name = strndup(tok->str, tok->len);
     fn->type = type;
     vec_add(funcs, fn);
   }

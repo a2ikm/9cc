@@ -11,6 +11,9 @@
 #define PTR_SIZE 8
 #define INT_SIZE 4
 
+// helper.c
+char *strndup(const char *s, size_t n);
+
 void error_at(char *loc, char *fmt, ...);
 
 typedef struct {
@@ -134,7 +137,6 @@ char *user_input;
 
 // tokenize.c
 void tokenize();
-char *token_copy_string();
 
 // parse.c
 void parse();
