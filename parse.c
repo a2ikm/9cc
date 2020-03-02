@@ -120,7 +120,7 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
-Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
+Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
   node->lhs = lhs;
@@ -137,7 +137,7 @@ Node *new_num(int val) {
 }
 
 Node *new_unary(NodeKind kind, Node *expr) {
-  return new_node(kind, expr, NULL);
+  return new_binary(kind, expr, NULL);
 }
 
 Node *num() {
@@ -191,7 +191,7 @@ Node *unary() {
   if (consume("+"))
     return primary();
   if (consume("-")) {
-    Node *node = new_node(ND_SUB, new_num(0), primary());
+    Node *node = new_binary(ND_SUB, new_num(0), primary());
     node->type = node->rhs->type;
     return node;
   }
@@ -213,10 +213,10 @@ Node *mul() {
 
   for (;;) {
     if (consume("*")) {
-      node = new_node(ND_MUL, node, unary());
+      node = new_binary(ND_MUL, node, unary());
       node->type = node->lhs->type;
     } else if (consume("/")) {
-      node = new_node(ND_DIV, node, unary());
+      node = new_binary(ND_DIV, node, unary());
       node->type = node->lhs->type;
     } else {
       return node;
@@ -229,7 +229,7 @@ Node *add() {
 
   for (;;) {
     if (consume("+")) {
-      node = new_node(ND_ADD, node, mul());
+      node = new_binary(ND_ADD, node, mul());
       if (node->lhs->type->kind == TYPE_PTR)
         node->type = node->lhs->type;
       else if (node->rhs->type->kind == TYPE_PTR)
@@ -237,7 +237,7 @@ Node *add() {
       else
         node->type = node->lhs->type;
     } else if (consume("-")) {
-      node = new_node(ND_SUB, node, mul());
+      node = new_binary(ND_SUB, node, mul());
       if (node->lhs->type->kind == TYPE_PTR)
         node->type = node->lhs->type;
       else if (node->rhs->type->kind == TYPE_PTR)
@@ -255,17 +255,17 @@ Node *relational() {
 
   for (;;) {
     if (consume("<")) {
-      node = new_node(ND_LT, node, add());
+      node = new_binary(ND_LT, node, add());
       node->type = new_type_int();
     } else if (consume("<=")) {
       node->type = new_type_int();
-      node = new_node(ND_LTEQ, node, add());
+      node = new_binary(ND_LTEQ, node, add());
     } else if (consume(">")) {
       node->type = new_type_int();
-      node = new_node(ND_LT, add(), node);
+      node = new_binary(ND_LT, add(), node);
     } else if (consume(">=")) {
       node->type = new_type_int();
-      node = new_node(ND_LTEQ, add(), node);
+      node = new_binary(ND_LTEQ, add(), node);
     } else {
       return node;
     }
@@ -277,10 +277,10 @@ Node *equality() {
 
   for (;;) {
     if (consume("==")) {
-      node = new_node(ND_EQ, node, relational());
+      node = new_binary(ND_EQ, node, relational());
       node->type = new_type_int();
     } else if (consume("!=")) {
-      node = new_node(ND_NEQ, node, relational());
+      node = new_binary(ND_NEQ, node, relational());
       node->type = new_type_int();
     }
     else
@@ -291,7 +291,7 @@ Node *equality() {
 Node *assign() {
   Node *node = equality();
   if (consume("=")) {
-    node = new_node(ND_ASSIGN, node, assign());
+    node = new_binary(ND_ASSIGN, node, assign());
     node->type = node->lhs->type;
   }
   return node;
