@@ -60,7 +60,7 @@ Type *new_type(TypeKind kind) {
 
 Type *new_type_int() {
   Type *type = new_type(TYPE_INT);
-  type->size = INT_SIZE;
+  type->size = DWORD_SIZE;
   return type;
 }
 

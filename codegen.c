@@ -27,7 +27,7 @@ void gen(Node *node) {
     case ND_LVAR:
       gen_lval(node);
       printf("  pop rax\n");
-      if (node->type->size == INT_SIZE)
+      if (node->type->size == DWORD_SIZE)
         printf("  movsxd rax, dword ptr [rax]\n");
       else
         printf("  mov rax, [rax]\n");
@@ -39,7 +39,7 @@ void gen(Node *node) {
     case ND_DEREF:
       gen(node->lhs);
       printf("  pop rax\n");
-      if (node->type->size == INT_SIZE)
+      if (node->type->size == DWORD_SIZE)
         printf("  movsxd rax, dword ptr [rax]\n");
       else
         printf("  mov rax, [rax]\n");
@@ -51,7 +51,7 @@ void gen(Node *node) {
 
       printf("  pop rdi\n");
       printf("  pop rax\n");
-      if (node->type->size == INT_SIZE)
+      if (node->type->size == DWORD_SIZE)
         printf("  mov [rax], edi\n");
       else
         printf("  mov [rax], rdi\n");
@@ -153,7 +153,7 @@ void gen(Node *node) {
 
       for (int i = 0; i < vec_len(node->params); i++) {
         LVar *lvar = vec_get(node->params, i);
-        if (lvar->type->size == INT_SIZE)
+        if (lvar->type->size == DWORD_SIZE)
           printf("  mov [rbp-%d], %s\n", lvar->offset, regs4[i]);
         else
           printf("  mov [rbp-%d], %s\n", lvar->offset, regs8[i]);

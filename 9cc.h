@@ -9,7 +9,7 @@
 #include <string.h>
 
 #define PTR_SIZE 8
-#define INT_SIZE 4
+#define DWORD_SIZE 4
 
 // helper.c
 char *strndup(const char *s, size_t n);
