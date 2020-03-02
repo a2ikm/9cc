@@ -128,7 +128,7 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   return node;
 }
 
-Node *new_node_num(int val) {
+Node *new_num(int val) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_NUM;
   node->val = val;
@@ -137,7 +137,7 @@ Node *new_node_num(int val) {
 }
 
 Node *num() {
-  return new_node_num(expect_number());
+  return new_num(expect_number());
 }
 
 Node *expr();
@@ -187,7 +187,7 @@ Node *unary() {
   if (consume("+"))
     return primary();
   if (consume("-")) {
-    Node *node = new_node(ND_SUB, new_node_num(0), primary());
+    Node *node = new_node(ND_SUB, new_num(0), primary());
     node->type = node->rhs->type;
     return node;
   }
