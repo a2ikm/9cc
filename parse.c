@@ -229,29 +229,38 @@ Node *mul() {
   }
 }
 
+Node *new_add(Node *lhs, Node *rhs) {
+  Node *node = new_binary(ND_ADD, lhs, rhs);
+  if (node->lhs->type->kind == TYPE_PTR)
+    node->type = node->lhs->type;
+  else if (node->rhs->type->kind == TYPE_PTR)
+    node->type = node->rhs->type;
+  else
+    node->type = node->lhs->type;
+  return node;
+}
+
+Node *new_sub(Node *lhs, Node *rhs) {
+  Node *node = new_binary(ND_SUB, lhs, rhs);
+ if (node->lhs->type->kind == TYPE_PTR)
+    node->type = node->lhs->type;
+  else if (node->rhs->type->kind == TYPE_PTR)
+    node->type = node->rhs->type;
+  else
+    node->type = node->lhs->type;
+  return node;
+}
+
 Node *add() {
   Node *node = mul();
 
   for (;;) {
-    if (consume("+")) {
-      node = new_binary(ND_ADD, node, mul());
-      if (node->lhs->type->kind == TYPE_PTR)
-        node->type = node->lhs->type;
-      else if (node->rhs->type->kind == TYPE_PTR)
-        node->type = node->rhs->type;
-      else
-        node->type = node->lhs->type;
-    } else if (consume("-")) {
-      node = new_binary(ND_SUB, node, mul());
-      if (node->lhs->type->kind == TYPE_PTR)
-        node->type = node->lhs->type;
-      else if (node->rhs->type->kind == TYPE_PTR)
-        node->type = node->rhs->type;
-      else
-        node->type = node->lhs->type;
-    } else {
+    if (consume("+"))
+      node = new_add(node, mul());
+    else if (consume("-"))
+      node = new_sub(node, mul());
+    else
       return node;
-    }
   }
 }
 
