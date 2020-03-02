@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+Type *int_type = &(Type){ TYPE_INT, DWORD_SIZE, NULL };
+
 void dump_type(Node *node) {
   Type *type = node->type;
   fprintf(stderr, "%s: ", node->name);
@@ -55,12 +57,6 @@ Type *new_type(TypeKind kind) {
   Type *type = malloc(sizeof(Type));
   type->kind = kind;
   type->ptr_to = NULL;
-  return type;
-}
-
-Type *new_type_int() {
-  Type *type = new_type(TYPE_INT);
-  type->size = DWORD_SIZE;
   return type;
 }
 
@@ -136,7 +132,7 @@ Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
 Node *new_num(int val) {
   Node *node = new_node(ND_NUM);
   node->val = val;
-  node->type = new_type_int();
+  node->type = int_type;
   return node;
 }
 
@@ -270,15 +266,15 @@ Node *relational() {
   for (;;) {
     if (consume("<")) {
       node = new_binary(ND_LT, node, add());
-      node->type = new_type_int();
+      node->type = int_type;
     } else if (consume("<=")) {
-      node->type = new_type_int();
+      node->type = int_type;
       node = new_binary(ND_LTEQ, node, add());
     } else if (consume(">")) {
-      node->type = new_type_int();
+      node->type = int_type;
       node = new_binary(ND_LT, add(), node);
     } else if (consume(">=")) {
-      node->type = new_type_int();
+      node->type = int_type;
       node = new_binary(ND_LTEQ, add(), node);
     } else {
       return node;
@@ -292,10 +288,10 @@ Node *equality() {
   for (;;) {
     if (consume("==")) {
       node = new_binary(ND_EQ, node, relational());
-      node->type = new_type_int();
+      node->type = int_type;
     } else if (consume("!=")) {
       node = new_binary(ND_NEQ, node, relational());
-      node->type = new_type_int();
+      node->type = int_type;
     }
     else
       return node;
@@ -363,7 +359,7 @@ Node *stmt() {
   }
 
   if (consume_kind(TK_INT)) {
-    Type *type = new_type_int();
+    Type *type = int_type;
     while (!at_eof()) {
       if (consume("*")) {
         type = new_type_ptr_to(type);
@@ -387,7 +383,7 @@ Node *stmt() {
 
 void func() {
   expect_kind(TK_INT);
-  Type *type = new_type_int();
+  Type *type = int_type;
   while (!at_eof()) {
     if (consume("*")) {
       type = new_type_ptr_to(type);
@@ -412,7 +408,7 @@ void func() {
   if (!consume(")")) {
     while (!at_eof()) {
       expect_kind(TK_INT);
-      Type *type = new_type_int();
+      Type *type = int_type;
       while (!at_eof()) {
         if (consume("*")) {
           type = new_type_ptr_to(type);

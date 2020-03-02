@@ -64,6 +64,8 @@ struct Type {
   struct Type *ptr_to;
 };
 
+extern Type *int_type;
+
 typedef struct LVar LVar;
 
 struct LVar {
