@@ -193,6 +193,10 @@ void gen(Node *node) {
       printf("  imul rdi, %ld\n", node->lhs->type->ptr_to->size);
       printf("  add rax, rdi\n");
       break;
+    case ND_PTR_SUB:
+      printf("  imul rdi, %ld\n", node->lhs->type->ptr_to->size);
+      printf("  sub rax, rdi\n");
+      break;
     case ND_EQ:
       printf("  cmp rax, rdi\n");
       printf("  sete al\n");
