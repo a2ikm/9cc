@@ -253,6 +253,9 @@ Node *new_sub(Node *lhs, Node *rhs) {
   } else if (lhs->type->kind == TYPE_PTR && rhs->type->kind == TYPE_INT) {
     node = new_binary(ND_PTR_SUB, lhs, rhs);
     node->type = lhs->type;
+  } else if (lhs->type->kind == TYPE_PTR && rhs->type->kind == TYPE_PTR) {
+    node = new_binary(ND_PTR_DIFF, lhs, rhs);
+    node->type = int_type;
   } else {
     error("kind mismatch: lhs=%d rhs=%d", lhs->type->kind, rhs->type->kind);
   }

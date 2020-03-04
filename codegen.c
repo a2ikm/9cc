@@ -197,6 +197,12 @@ void gen(Node *node) {
       printf("  imul rdi, %ld\n", node->lhs->type->ptr_to->size);
       printf("  sub rax, rdi\n");
       break;
+    case ND_PTR_DIFF:
+      printf("  sub rax, rdi\n");
+      printf("  mov rdi, %ld\n", node->lhs->type->ptr_to->size);
+      printf("  cqo\n");
+      printf("  idiv rdi\n");
+      break;
     case ND_EQ:
       printf("  cmp rax, rdi\n");
       printf("  sete al\n");

@@ -85,6 +85,7 @@ typedef enum {
   ND_DEREF,
   ND_PTR_ADD,
   ND_PTR_SUB,
+  ND_PTR_DIFF,
   ND_EQ,
   ND_NEQ,
   ND_LT,

@@ -69,6 +69,8 @@ try 9 "int a(int x, int y, int z) { return x + y * z; } int main() { return a(1,
 try 3 "int main() { int x; int *y; x = 3; y = &x; return *y; }"
 try 3 "int main() { int x; int y; int *z; x = 3; y = 42; z = &y + 1; return *z; }"
 try 42 "int main() { int x; int y; int *z; x = 3; y = 42; z = &x - 1; return *z; }"
+try 0 "int main() { int x; int y; y = &x - &x; return y; }"
+try 1 "int main() { int x; int y; int z; z = &x - &y; return z; }"
 try 3 "int main() { int x; int *y; y = &x; *y = 3; return 3; }"
 try 3 "int main() { int x; int *y; int **z; x = 3; y = &x; z = &y; return **z; }"
 
