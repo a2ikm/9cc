@@ -67,7 +67,7 @@ try 8 "int fb(int x) { if (x == 0) { return 1; } else if (x == 1) { return 1; } 
 try 3 "int a(int x, int y) { return x + y; } int main() { return a(1, 2); }"
 try 9 "int a(int x, int y, int z) { return x + y * z; } int main() { return a(1, 2, 4); }"
 try 3 "int main() { int x; int *y; x = 3; y = &x; return *y; }"
-try 3 "int main() { int x; int y; int *z; x = 3; y = 42; z = &y + 4; return *z; }"
+try 3 "int main() { int x; int y; int *z; x = 3; y = 42; z = &y + 1; return *z; }"
 try 3 "int main() { int x; int *y; y = &x; *y = 3; return 3; }"
 try 3 "int main() { int x; int *y; int **z; x = 3; y = &x; z = &y; return **z; }"
 

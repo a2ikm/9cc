@@ -226,13 +226,21 @@ Node *mul() {
 }
 
 Node *new_add(Node *lhs, Node *rhs) {
-  Node *node = new_binary(ND_ADD, lhs, rhs);
-  if (node->lhs->type->kind == TYPE_PTR)
-    node->type = node->lhs->type;
-  else if (node->rhs->type->kind == TYPE_PTR)
-    node->type = node->rhs->type;
-  else
-    node->type = node->lhs->type;
+  Node *node;
+
+  if (lhs->type->kind == TYPE_INT && rhs->type->kind == TYPE_INT) {
+    node = new_binary(ND_ADD, lhs, rhs);
+    node->type = int_type;
+  } else if (lhs->type->kind == TYPE_INT && rhs->type->kind == TYPE_PTR) {
+    node = new_binary(ND_PTR_ADD, rhs, lhs);
+    node->type = rhs->type;
+  } else if (lhs->type->kind == TYPE_PTR && rhs->type->kind == TYPE_INT) {
+    node = new_binary(ND_PTR_ADD, lhs, rhs);
+    node->type = lhs->type;
+  } else {
+    error("kind mismatch: lhs=%d rhs=%d", lhs->type->kind, rhs->type->kind);
+  }
+
   return node;
 }
 

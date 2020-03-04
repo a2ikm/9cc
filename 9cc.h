@@ -83,6 +83,7 @@ typedef enum {
   ND_DIV,
   ND_ADDR,
   ND_DEREF,
+  ND_PTR_ADD,
   ND_EQ,
   ND_NEQ,
   ND_LT,
