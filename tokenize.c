@@ -125,6 +125,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "sizeof")) {
+      cur = new_token(TK_SIZEOF, cur, p, 6);
+      p += 6;
+      continue;
+    }
+
     if (isalpha(*p)) {
       char *old_p = p;
       p = read_ident(p);

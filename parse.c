@@ -206,6 +206,11 @@ Node *unary() {
     node->type = new_type_ptr_to(node->lhs->type);
     return node;
   }
+  if (consume_kind(TK_SIZEOF)) {
+    Node *node = new_unary(ND_SIZEOF, unary());
+    node->type = int_type;
+    return node;
+  }
   return primary();
 }
 

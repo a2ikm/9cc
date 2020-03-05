@@ -73,6 +73,10 @@ try 0 "int main() { int x; int y; y = &x - &x; return y; }"
 try 1 "int main() { int x; int y; int z; z = &x - &y; return z; }"
 try 3 "int main() { int x; int *y; y = &x; *y = 3; return 3; }"
 try 3 "int main() { int x; int *y; int **z; x = 3; y = &x; z = &y; return **z; }"
+try 4 "int main() { return sizeof(1); }"
+try 4 "int main() { int x; return sizeof(x); }"
+try 8 "int main() { int *x; return sizeof(x); }"
+try 4 "int main() { return sizeof(sizeof(1)); }"
 
 try_foo() {
   input="$1"

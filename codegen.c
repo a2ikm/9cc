@@ -57,6 +57,9 @@ void gen(Node *node) {
         printf("  mov [rax], rdi\n");
       printf("  push rdi\n");
       return;
+    case ND_SIZEOF:
+      printf("  push %ld\n", node->lhs->type->size);
+      return;
     case ND_RETURN:
       gen(node->lhs);
       printf("  pop rax\n");
