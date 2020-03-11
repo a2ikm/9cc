@@ -56,6 +56,7 @@ struct Token {
 typedef enum {
   TYPE_PTR,
   TYPE_INT,
+  TYPE_ARRAY,
 } TypeKind;
 
 typedef struct Type Type;
@@ -64,6 +65,7 @@ struct Type {
   TypeKind kind;
   size_t size;
   struct Type *ptr_to;
+  size_t array_size;
 };
 
 extern Type *int_type;
