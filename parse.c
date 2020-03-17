@@ -8,7 +8,7 @@ void dump_type(Node *node) {
   for (;type;) {
     if (type->kind == TYPE_PTR) {
       fprintf(stderr, "ptr->");
-      type = type->ptr_to;
+      type = type->base;
     } else if (type->kind == TYPE_INT) {
       fprintf(stderr, "int\n");
       return;
@@ -56,22 +56,22 @@ Function *find_func(Token *tok) {
 Type *new_type(TypeKind kind) {
   Type *type = malloc(sizeof(Type));
   type->kind = kind;
-  type->ptr_to = NULL;
+  type->base = NULL;
   return type;
 }
 
-Type *pointer_to(Type *ptr_to) {
+Type *pointer_to(Type *base) {
   Type *type = new_type(TYPE_PTR);
   type->size = QWORD_SIZE;
-  type->ptr_to = ptr_to;
+  type->base = base;
   return type;
 }
 
-Type *array_of(Type *ptr_to, size_t array_size) {
+Type *array_of(Type *base, size_t array_size) {
   Type *type = new_type(TYPE_ARRAY);
-  type->ptr_to = ptr_to;
+  type->base = base;
   type->array_size = array_size;
-  type->size = array_size * ptr_to->size;
+  type->size = array_size * base->size;
   return type;
 }
 
@@ -206,7 +206,7 @@ Node *unary() {
   }
   if (consume("*")) {
     Node *node = new_unary(ND_DEREF, unary());
-    node->type = node->lhs->type->ptr_to;
+    node->type = node->lhs->type->base;
     return node;
   }
   if (consume("&")) {

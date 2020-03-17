@@ -193,16 +193,16 @@ void gen(Node *node) {
       printf("  idiv rdi\n");
       break;
     case ND_PTR_ADD:
-      printf("  imul rdi, %ld\n", node->lhs->type->ptr_to->size);
+      printf("  imul rdi, %ld\n", node->lhs->type->base->size);
       printf("  add rax, rdi\n");
       break;
     case ND_PTR_SUB:
-      printf("  imul rdi, %ld\n", node->lhs->type->ptr_to->size);
+      printf("  imul rdi, %ld\n", node->lhs->type->base->size);
       printf("  sub rax, rdi\n");
       break;
     case ND_PTR_DIFF:
       printf("  sub rax, rdi\n");
-      printf("  mov rdi, %ld\n", node->lhs->type->ptr_to->size);
+      printf("  mov rdi, %ld\n", node->lhs->type->base->size);
       printf("  cqo\n");
       printf("  idiv rdi\n");
       break;

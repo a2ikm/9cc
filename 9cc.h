@@ -64,7 +64,7 @@ typedef struct Type Type;
 struct Type {
   TypeKind kind;
   size_t size;
-  struct Type *ptr_to;
+  struct Type *base;
   size_t array_size;
 };
 
