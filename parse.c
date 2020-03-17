@@ -60,7 +60,7 @@ Type *new_type(TypeKind kind) {
   return type;
 }
 
-Type *new_type_ptr_to(Type *ptr_to) {
+Type *pointer_to(Type *ptr_to) {
   Type *type = new_type(TYPE_PTR);
   type->size = QWORD_SIZE;
   type->ptr_to = ptr_to;
@@ -211,7 +211,7 @@ Node *unary() {
   }
   if (consume("&")) {
     Node *node = new_unary(ND_ADDR, unary());
-    node->type = new_type_ptr_to(node->lhs->type);
+    node->type = pointer_to(node->lhs->type);
     return node;
   }
   if (consume_kind(TK_SIZEOF)) {
@@ -391,7 +391,7 @@ Node *stmt() {
     Type *type = int_type;
     while (!at_eof()) {
       if (consume("*")) {
-        type = new_type_ptr_to(type);
+        type = pointer_to(type);
         continue;
       }
       break;
@@ -420,7 +420,7 @@ void func() {
   Type *type = int_type;
   while (!at_eof()) {
     if (consume("*")) {
-      type = new_type_ptr_to(type);
+      type = pointer_to(type);
       continue;
     }
     break;
@@ -445,7 +445,7 @@ void func() {
       Type *type = int_type;
       while (!at_eof()) {
         if (consume("*")) {
-          type = new_type_ptr_to(type);
+          type = pointer_to(type);
           continue;
         }
         break;
