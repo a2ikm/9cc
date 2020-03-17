@@ -67,7 +67,7 @@ Type *new_type_ptr_to(Type *ptr_to) {
   return type;
 }
 
-Type *new_type_array_of(Type *ptr_to, size_t array_size) {
+Type *array_of(Type *ptr_to, size_t array_size) {
   Type *type = new_type(TYPE_ARRAY);
   type->ptr_to = ptr_to;
   type->array_size = array_size;
@@ -399,7 +399,7 @@ Node *stmt() {
     Token *tok = expect_kind(TK_IDENT);
     if (consume("[")) {
       int array_size = expect_number();
-      type = new_type_array_of(type, array_size);
+      type = array_of(type, array_size);
       expect("]");
     }
     new_lvar(tok, type);
