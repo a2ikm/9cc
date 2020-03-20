@@ -6,14 +6,19 @@ char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
 unsigned int label_idx = 0;
 
 void gen_lval(Node *node) {
-  if (node->kind != ND_LVAR && node->kind != ND_ADDR && node->kind != ND_DEREF) {
-    fprintf(stderr, "代入の左辺値が変数かアドレスのどちらでもありません\n");
-    exit(1);
+  switch(node->kind) {
+    case ND_LVAR:
+    case ND_ADDR:
+      printf("  mov rax, rbp\n");
+      printf("  sub rax, %d\n", node->offset);
+      printf("  push rax\n");
+      return;
+    case ND_DEREF:
+      gen(node->lhs);
+      return;
   }
 
-  printf("  mov rax, rbp\n");
-  printf("  sub rax, %d\n", node->offset);
-  printf("  push rax\n");
+  error("代入の左辺値が変数かアドレスのどちらでもありません");
 }
 
 void load(Type *type) {
@@ -49,14 +54,16 @@ void gen(Node *node) {
       return;
     case ND_LVAR:
       gen_lval(node);
-      load(node->type);
+      if (node->type->kind != TYPE_ARRAY)
+        load(node->type);
       return;
     case ND_ADDR:
       gen_lval(node->lhs);
       return;
     case ND_DEREF:
       gen(node->lhs);
-      load(node->type);
+      if (node->type->kind != TYPE_ARRAY)
+        load(node->type);
       return;
     case ND_ASSIGN:
       gen_lval(node->lhs);

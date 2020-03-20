@@ -77,6 +77,7 @@ try 4 "int main() { return sizeof(1); }"
 try 4 "int main() { int x; return sizeof(x); }"
 try 8 "int main() { int *x; return sizeof(x); }"
 try 4 "int main() { return sizeof(sizeof(1)); }"
+try 2 "int main() { int a[1]; *a = 2; return *a; }"
 
 try_foo() {
   input="$1"
