@@ -16,6 +16,17 @@ void gen_lval(Node *node) {
   printf("  push rax\n");
 }
 
+void load(Type *type) {
+  printf("  pop rax\n");
+
+  if (type->size == DWORD_SIZE)
+    printf("  movsxd rax, dword ptr [rax]\n");
+  else
+    printf("  mov rax, [rax]\n");
+
+  printf("  push rax\n");
+}
+
 void gen(Node *node) {
   unsigned int tmp_label_idx;
   int frame_size = 0;
@@ -26,24 +37,14 @@ void gen(Node *node) {
       return;
     case ND_LVAR:
       gen_lval(node);
-      printf("  pop rax\n");
-      if (node->type->size == DWORD_SIZE)
-        printf("  movsxd rax, dword ptr [rax]\n");
-      else
-        printf("  mov rax, [rax]\n");
-      printf("  push rax\n");
+      load(node->type);
       return;
     case ND_ADDR:
       gen_lval(node->lhs);
       return;
     case ND_DEREF:
       gen(node->lhs);
-      printf("  pop rax\n");
-      if (node->type->size == DWORD_SIZE)
-        printf("  movsxd rax, dword ptr [rax]\n");
-      else
-        printf("  mov rax, [rax]\n");
-      printf("  push rax\n");
+      load(node->type);
       return;
     case ND_ASSIGN:
       gen_lval(node->lhs);
