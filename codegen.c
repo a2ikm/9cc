@@ -27,6 +27,18 @@ void load(Type *type) {
   printf("  push rax\n");
 }
 
+void store(Type *type) {
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
+
+  if (type->size == DWORD_SIZE)
+    printf("  mov [rax], edi\n");
+  else
+    printf("  mov [rax], rdi\n");
+
+  printf("  push rdi\n");
+}
+
 void gen(Node *node) {
   unsigned int tmp_label_idx;
   int frame_size = 0;
@@ -49,14 +61,7 @@ void gen(Node *node) {
     case ND_ASSIGN:
       gen_lval(node->lhs);
       gen(node->rhs);
-
-      printf("  pop rdi\n");
-      printf("  pop rax\n");
-      if (node->type->size == DWORD_SIZE)
-        printf("  mov [rax], edi\n");
-      else
-        printf("  mov [rax], rdi\n");
-      printf("  push rdi\n");
+      store(node->type);
       return;
     case ND_SIZEOF:
       printf("  push %ld\n", node->lhs->type->size);
