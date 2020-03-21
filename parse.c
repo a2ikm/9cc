@@ -198,11 +198,9 @@ Node *primary() {
 
         node = new_unary(ND_DEREF, node);
         node->type = node->lhs->type->base;
-
-        return node;
-      } else {
-        return node;
       }
+
+      return node;
     }
   }
 
