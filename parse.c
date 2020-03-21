@@ -263,10 +263,10 @@ Node *new_sub(Node *lhs, Node *rhs) {
   if (lhs->type->kind == TYPE_INT && rhs->type->kind == TYPE_INT) {
     node = new_binary(ND_SUB, lhs, rhs);
     node->type = int_type;
-  } else if (lhs->type->kind == TYPE_PTR && rhs->type->kind == TYPE_INT) {
+  } else if (rhs->type->kind == TYPE_INT) {
     node = new_binary(ND_PTR_SUB, lhs, rhs);
     node->type = lhs->type;
-  } else if (lhs->type->kind == TYPE_PTR && rhs->type->kind == TYPE_PTR) {
+  } else if (lhs->type->kind == TYPE_PTR) {
     node = new_binary(ND_PTR_DIFF, lhs, rhs);
     node->type = int_type;
   } else {
