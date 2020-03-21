@@ -156,6 +156,7 @@ Node *num() {
 }
 
 Node *expr();
+Node *new_add(Node *lhs, Node *rhs);
 
 Node *primary() {
   if (consume("(")) {
@@ -189,7 +190,23 @@ Node *primary() {
       node->offset = lvar->offset;
       node->name = strndup(tok->str, tok->len);
       node->type = lvar->type;
-      return node;
+
+      if (consume("[")) {
+        node = new_add(node, expr());
+        expect("]");
+
+        if (node->lhs->type->kind == TYPE_ARRAY)
+          node->type = node->lhs->type;
+        else
+          node->type = node->rhs->type;
+
+        node = new_unary(ND_DEREF, node);
+        node->type = node->lhs->type->base;
+
+        return node;
+      } else {
+        return node;
+      }
     }
   }
 
