@@ -193,12 +193,8 @@ Node *primary() {
 
       if (consume("[")) {
         node = new_add(node, expr());
+        node->type = node->lhs->type;
         expect("]");
-
-        if (node->lhs->type->kind == TYPE_ARRAY)
-          node->type = node->lhs->type;
-        else
-          node->type = node->rhs->type;
 
         node = new_unary(ND_DEREF, node);
         node->type = node->lhs->type->base;
