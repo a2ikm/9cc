@@ -70,9 +70,9 @@ struct Type {
 
 extern Type *int_type;
 
-typedef struct LVar LVar;
+typedef struct Var Var;
 
-struct LVar {
+struct Var {
   char *name;
   int len;
   int offset;

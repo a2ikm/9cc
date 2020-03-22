@@ -19,22 +19,22 @@ void dump_type(Node *node) {
 
 Vector *lvars;
 
-LVar *find_lvar(Token *tok) {
+Var *find_lvar(Token *tok) {
   for (int i = 0; i < vec_len(lvars); i++) {
-    LVar *lvar = vec_get(lvars, i);
+    Var *lvar = vec_get(lvars, i);
     if (lvar->len == tok->len && !memcmp(tok->str, lvar->name, lvar->len))
       return lvar;
   }
   return NULL;
 }
 
-LVar *new_lvar(Token *tok, Type *type) {
-  LVar *lvar = calloc(1, sizeof(LVar));
+Var *new_lvar(Token *tok, Type *type) {
+  Var *lvar = calloc(1, sizeof(Var));
   lvar->name = tok->str;
   lvar->len = tok->len;
   lvar->type = type;
 
-  LVar *last = vec_last(lvars);
+  Var *last = vec_last(lvars);
   if (last)
     lvar->offset = last->offset + lvar->type->size;
   else
@@ -186,7 +186,7 @@ Node *primary() {
     } else {
       Node *node = new_node(ND_LVAR);
 
-      LVar *lvar = find_lvar(tok);
+      Var *lvar = find_lvar(tok);
       node->offset = lvar->offset;
       node->name = strndup(tok->str, tok->len);
       node->type = lvar->type;

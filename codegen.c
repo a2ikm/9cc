@@ -163,12 +163,12 @@ void gen(Node *node) {
 
       size_t frame_size = 0;
       for (int i = 0; i < vec_len(node->lvars); i++)
-        frame_size += ((LVar *)vec_get(node->lvars, i))->type->size;
+        frame_size += ((Var *)vec_get(node->lvars, i))->type->size;
       if (frame_size > 0)
         printf("  sub rsp, %ld\n", frame_size);
 
       for (int i = 0; i < vec_len(node->params); i++) {
-        LVar *lvar = vec_get(node->params, i);
+        Var *lvar = vec_get(node->params, i);
         if (lvar->type->size == DWORD_SIZE)
           printf("  mov [rbp-%d], %s\n", lvar->offset, regsd[i]);
         else
