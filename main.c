@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
   }
 
   funcs = vec_new();
+  gvars = vec_new();
 
   user_input = argv[1];
   tokenize();

@@ -142,6 +142,7 @@ typedef struct {
 } Function;
 
 Vector *funcs;
+Vector *gvars;
 
 Token *token;
 char *user_input;

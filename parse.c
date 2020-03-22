@@ -50,6 +50,14 @@ Var *new_lvar(Token *tok, Type *type) {
   return lvar;
 }
 
+Var *new_gvar(Token *tok, Type *type) {
+  Var *gvar = new_var(tok, type);
+  gvar->is_local = false;
+
+  vec_add(gvars, gvar);
+  return gvar;
+}
+
 Function *find_func(Token *tok) {
   for (int i = 0; i < vec_len(funcs); i++) {
     Function *fn = vec_get(funcs, i);
@@ -443,57 +451,66 @@ void func() {
     break;
   }
   Token *tok = expect_kind(TK_IDENT);
-  expect("(");
 
-  Function *fn = find_func(tok);
-  if (!fn) {
-    fn = calloc(1, sizeof(Function));
-    fn->name = strndup(tok->str, tok->len);
-    fn->type = type;
-    vec_add(funcs, fn);
-  }
+  if (consume("(")) {
+    Function *fn = find_func(tok);
+    if (!fn) {
+      fn = calloc(1, sizeof(Function));
+      fn->name = strndup(tok->str, tok->len);
+      fn->type = type;
+      vec_add(funcs, fn);
+    }
 
-  // parse params
-  Vector *params = vec_new();
-  lvars = vec_new();
-  if (!consume(")")) {
-    while (!at_eof()) {
-      expect_kind(TK_INT);
-      Type *type = int_type;
+    // parse params
+    Vector *params = vec_new();
+    lvars = vec_new();
+    if (!consume(")")) {
       while (!at_eof()) {
-        if (consume("*")) {
-          type = pointer_to(type);
-          continue;
+        expect_kind(TK_INT);
+        Type *type = int_type;
+        while (!at_eof()) {
+          if (consume("*")) {
+            type = pointer_to(type);
+            continue;
+          }
+          break;
         }
+        tok = expect_kind(TK_IDENT);
+        vec_add(params, new_lvar(tok, type));
+        if (consume(","))
+          continue;
         break;
       }
-      tok = expect_kind(TK_IDENT);
-      vec_add(params, new_lvar(tok, type));
-      if (consume(","))
-        continue;
-      break;
+      expect(")");
     }
-    expect(")");
+
+    if (consume(";"))
+      return;
+
+    Node *node = new_node(ND_FUNC);
+    node->name = fn->name;
+    node->type = fn->type;
+    node->params = params;
+    node->stmts = vec_new();
+    node->lvars = lvars;
+    fn->node = node;
+
+    expect("{");
+    while (!at_eof()) {
+      if (consume("}"))
+        break;
+      vec_add(node->stmts, (void *)stmt());
+    }
+  } else {
+    if (consume("[")) {
+      int array_size = expect_number();
+      type = array_of(type, array_size);
+      expect("]");
+    }
+    expect(";");
+
+    new_gvar(tok, type);
   }
-
-  if (consume(";"))
-    return;
-
-  Node *node = new_node(ND_FUNC);
-  node->name = fn->name;
-  node->type = fn->type;
-  node->params = params;
-  node->stmts = vec_new();
-  node->lvars = lvars;
-  fn->node = node;
-
-  expect("{");
-  while (!at_eof()) {
-    if (consume("}"))
-      break;
-    vec_add(node->stmts, (void *)stmt());
-  }
-  return;
 }
 
 void program() {

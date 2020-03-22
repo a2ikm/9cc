@@ -82,6 +82,7 @@ try 20 "int main() { int a[2]; *a = 10; *(a+1) = 20; return *(a+1); }"
 try 20 "int main() { int a[2]; *a = 10; *(1+a) = 20; return *(1+a); }"
 try 20 "int main() { int a[3]; *a = 10; *(a+2-1) = 20; return *(a+2-1); }"
 try 10 "int main() { int a[1]; a[0] = 10; return a[0]; }"
+try 42 "int x; int main() { return 42; }"
 
 try_foo() {
   input="$1"
