@@ -77,6 +77,7 @@ struct Var {
   int len;
   int offset;
   Type *type;
+  bool is_local;
 };
 
 typedef enum {

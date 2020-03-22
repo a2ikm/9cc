@@ -38,6 +38,7 @@ Var *find_lvar(Token *tok) {
 
 Var *new_lvar(Token *tok, Type *type) {
   Var *lvar = new_var(tok, type);
+  lvar->is_local = true;
 
   Var *last = vec_last(lvars);
   if (last)
