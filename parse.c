@@ -17,6 +17,14 @@ void dump_type(Node *node) {
   fprintf(stderr, "null\n");
 }
 
+Var *new_var(Token *tok, Type *type) {
+  Var *var = calloc(1, sizeof(Var));
+  var->name = strndup(tok->str, tok->len);
+  var->len = tok->len;
+  var->type = type;
+  return var;
+}
+
 Vector *lvars;
 
 Var *find_lvar(Token *tok) {
@@ -29,10 +37,7 @@ Var *find_lvar(Token *tok) {
 }
 
 Var *new_lvar(Token *tok, Type *type) {
-  Var *lvar = calloc(1, sizeof(Var));
-  lvar->name = tok->str;
-  lvar->len = tok->len;
-  lvar->type = type;
+  Var *lvar = new_var(tok, type);
 
   Var *last = vec_last(lvars);
   if (last)
