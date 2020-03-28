@@ -37,6 +37,13 @@ int main(int argc, char **argv) {
 
   printf(".intel_syntax noprefix\n");
 
+  printf(".bss\n");
+  for (int i = 0; i < vec_len(gvars); i++) {
+    Var *gvar = vec_get(gvars, i);
+    gen_gvar(gvar);
+  }
+
+  printf(".text\n");
   for (int i = 0; i < vec_len(funcs); i++) {
     Function *fn = vec_get(funcs, i);
     if (fn->node)

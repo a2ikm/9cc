@@ -96,6 +96,7 @@ typedef enum {
   ND_LTEQ,
   ND_ASSIGN,
   ND_LVAR,
+  ND_GVAR,
   ND_NUM,
   ND_SIZEOF,
   ND_RETURN,
@@ -155,5 +156,6 @@ void parse();
 
 // codegen.c
 void gen(Node *node);
+void gen_gvar(Var *gvar);
 
 #endif

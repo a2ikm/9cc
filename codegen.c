@@ -7,6 +7,10 @@ unsigned int label_idx = 0;
 
 void gen_lval(Node *node) {
   switch(node->kind) {
+    case ND_GVAR:
+      printf("  lea rax, %s[rip]\n", node->name);
+      printf("  push rax\n");
+      return;
     case ND_LVAR:
     case ND_ADDR:
       printf("  mov rax, rbp\n");
@@ -52,6 +56,7 @@ void gen(Node *node) {
     case ND_NUM:
       printf("  push %d\n", node->val);
       return;
+    case ND_GVAR:
     case ND_LVAR:
       gen_lval(node);
       if (node->type->kind != TYPE_ARRAY)
@@ -242,4 +247,9 @@ void gen(Node *node) {
   }
 
   printf("  push rax\n");
+}
+
+void gen_gvar(Var *gvar) {
+  printf("%s:\n", gvar->name);
+  printf("  .zero %ld\n", gvar->type->size);
 }

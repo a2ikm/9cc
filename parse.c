@@ -50,6 +50,15 @@ Var *new_lvar(Token *tok, Type *type) {
   return lvar;
 }
 
+Var *find_gvar(Token *tok) {
+  for (int i = 0; i < vec_len(gvars); i++) {
+    Var *gvar = vec_get(gvars, i);
+    if (gvar->len == tok->len && !memcmp(tok->str, gvar->name, gvar->len))
+      return gvar;
+  }
+  return NULL;
+}
+
 Var *new_gvar(Token *tok, Type *type) {
   Var *gvar = new_var(tok, type);
   gvar->is_local = false;
@@ -198,12 +207,20 @@ Node *primary() {
 
       return node;
     } else {
-      Node *node = new_node(ND_LVAR);
+      Var *var;
+      Node *node;
 
-      Var *lvar = find_lvar(tok);
-      node->offset = lvar->offset;
+      if (var = find_lvar(tok)) {
+        node = new_node(ND_LVAR);
+        node->offset = var->offset;
+      } else if (var = find_gvar(tok)) {
+        node = new_node(ND_GVAR);
+      } else {
+        error_at(tok->str, "Unknown variable");
+      }
+
       node->name = strndup(tok->str, tok->len);
-      node->type = lvar->type;
+      node->type = var->type;
 
       if (consume("[")) {
         node = new_add(node, expr());
