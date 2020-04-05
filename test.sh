@@ -88,6 +88,9 @@ try 42 "int x; int main() { int a; x = 41; a = x + 1; return a; }"
 try 10 "int main() { char a; a = 2; return a + 8; }"
 try 10 "int main() { char a; a = 2; int b; b = 8; return a + b; }"
 try 10 "int main() { char a[10]; a[0] = 10; return a[0]; } "
+try 10 "char a() { char x; x = 42; return x; } int main() { if (42 == a()) { return 10; } else { return 20; } }"
+try 10 "char a(char c) { return c + 1; } int main() { char c; c = 2; if (a(c) == 3) { return 10; } else { return 20; } }"
+try 10 "char a(char c) { return c + 1; } int main() { if (a(2) == 3) { return 10; } else { return 20; } }"
 
 try_foo() {
   input="$1"

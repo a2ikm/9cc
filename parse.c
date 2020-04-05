@@ -499,8 +499,9 @@ void func() {
     lvars = vec_new();
     if (!consume(")")) {
       while (!at_eof()) {
-        expect_kind(TK_INT);
-        Type *type = int_type;
+        Type *type = detect_type();
+        if (!type)
+          error("syntax error");
         while (!at_eof()) {
           if (consume("*")) {
             type = pointer_to(type);

@@ -1,7 +1,8 @@
 #include "9cc.h"
 
+char *regsb[] = { "dil", "sil", "dl",  "cl",  "r8b", "r9b" };
 char *regsd[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
-char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
+char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8",  "r9" };
 
 unsigned int label_idx = 0;
 
@@ -186,10 +187,16 @@ void gen(Node *node) {
 
       for (int i = 0; i < vec_len(node->params); i++) {
         Var *lvar = vec_get(node->params, i);
-        if (lvar->type->size == DWORD_SIZE)
-          printf("  mov [rbp-%d], %s\n", lvar->offset, regsd[i]);
-        else
-          printf("  mov [rbp-%d], %s\n", lvar->offset, regsq[i]);
+        switch (lvar->type->size) {
+          case DWORD_SIZE:
+            printf("  mov [rbp-%d], %s\n", lvar->offset, regsd[i]);
+            break;
+          case BYTE_SIZE:
+            printf("  mov [rbp-%d], %s\n", lvar->offset, regsb[i]);
+            break;
+          default:
+            printf("  mov [rbp-%d], %s\n", lvar->offset, regsq[i]);
+        }
       }
 
       for (int i = 0; i < vec_len(node->stmts); i++) {
