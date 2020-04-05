@@ -2,6 +2,10 @@
 
 Type *int_type = &(Type){ TYPE_INT, DWORD_SIZE, NULL };
 
+bool is_integer(Type *type) {
+  return type->kind == TYPE_INT;
+}
+
 void dump_type(Node *node) {
   Type *type = node->type;
   fprintf(stderr, "%s: ", node->name);
@@ -283,13 +287,13 @@ Node *mul() {
 Node *new_add(Node *lhs, Node *rhs) {
   Node *node;
 
-  if (lhs->type->kind == TYPE_INT && rhs->type->kind == TYPE_INT) {
+  if (is_integer(lhs->type) && is_integer(rhs->type)) {
     node = new_binary(ND_ADD, lhs, rhs);
     node->type = int_type;
-  } else if (lhs->type->kind == TYPE_INT) {
+  } else if (is_integer(lhs->type)) {
     node = new_binary(ND_PTR_ADD, rhs, lhs);
     node->type = rhs->type;
-  } else if (rhs->type->kind == TYPE_INT) {
+  } else if (is_integer(rhs->type)) {
     node = new_binary(ND_PTR_ADD, lhs, rhs);
     node->type = lhs->type;
   } else {
@@ -302,10 +306,10 @@ Node *new_add(Node *lhs, Node *rhs) {
 Node *new_sub(Node *lhs, Node *rhs) {
   Node *node;
 
-  if (lhs->type->kind == TYPE_INT && rhs->type->kind == TYPE_INT) {
+  if (is_integer(lhs->type) && is_integer(rhs->type)) {
     node = new_binary(ND_SUB, lhs, rhs);
     node->type = int_type;
-  } else if (rhs->type->kind == TYPE_INT) {
+  } else if (is_integer(rhs->type)) {
     node = new_binary(ND_PTR_SUB, lhs, rhs);
     node->type = lhs->type;
   } else if (lhs->type->kind == TYPE_PTR) {
