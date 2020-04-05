@@ -1,9 +1,10 @@
 #include "9cc.h"
 
 Type *int_type = &(Type){ TYPE_INT, DWORD_SIZE, NULL };
+Type *char_type = &(Type){ TYPE_CHAR, BYTE_SIZE, NULL };
 
 bool is_integer(Type *type) {
-  return type->kind == TYPE_INT;
+  return type->kind == TYPE_INT || type->kind == TYPE_CHAR;
 }
 
 void dump_type(Node *node) {
@@ -145,6 +146,15 @@ Token *expect_kind(TokenKind kind) {
   Token *tok = token;
   token = token->next;
   return tok;
+}
+
+Type *detect_type() {
+  if (consume_kind(TK_INT))
+    return int_type;
+  else if (consume_kind(TK_CHAR))
+    return char_type;
+  else
+    return NULL;
 }
 
 bool at_eof() {
@@ -433,8 +443,8 @@ Node *stmt() {
     return node;
   }
 
-  if (consume_kind(TK_INT)) {
-    Type *type = int_type;
+  Type *type = detect_type();
+  if (type) {
     while (!at_eof()) {
       if (consume("*")) {
         type = pointer_to(type);
@@ -462,8 +472,10 @@ Node *stmt() {
 }
 
 void func() {
-  expect_kind(TK_INT);
-  Type *type = int_type;
+  Type *type = detect_type();
+  if (!type)
+    error("syntax error");
+
   while (!at_eof()) {
     if (consume("*")) {
       type = pointer_to(type);

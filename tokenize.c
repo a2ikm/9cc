@@ -126,6 +126,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "char")) {
+      cur = new_token(TK_CHAR, cur, p, 4);
+      p += 4;
+      continue;
+    }
+
     if (match(p, "sizeof")) {
       cur = new_token(TK_SIZEOF, cur, p, 6);
       p += 6;

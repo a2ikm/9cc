@@ -28,10 +28,16 @@ void gen_lval(Node *node) {
 void load(Type *type) {
   printf("  pop rax\n");
 
-  if (type->size == DWORD_SIZE)
-    printf("  movsxd rax, dword ptr [rax]\n");
-  else
-    printf("  mov rax, [rax]\n");
+  switch (type->size) {
+    case DWORD_SIZE:
+      printf("  movsxd rax, dword ptr [rax]\n");
+      break;
+    case BYTE_SIZE:
+      printf("  movsx rax, byte ptr [rax]\n");
+      break;
+    default:
+      printf("  mov rax, [rax]\n");
+  }
 
   printf("  push rax\n");
 }
@@ -40,10 +46,16 @@ void store(Type *type) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  if (type->size == DWORD_SIZE)
-    printf("  mov [rax], edi\n");
-  else
-    printf("  mov [rax], rdi\n");
+  switch (type->size) {
+    case DWORD_SIZE:
+      printf("  mov [rax], edi\n");
+      break;
+    case BYTE_SIZE:
+      printf("  mov [rax], dil\n");
+      break;
+    default:
+      printf("  mov [rax], rdi\n");
+  }
 
   printf("  push rdi\n");
 }

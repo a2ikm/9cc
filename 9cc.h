@@ -10,6 +10,7 @@
 
 #define QWORD_SIZE 8
 #define DWORD_SIZE 4
+#define BYTE_SIZE 1
 
 // helper.c
 char *strndup(const char *s, size_t n);
@@ -37,6 +38,7 @@ typedef enum {
   TK_WHILE,     // "while"
   TK_FOR,       // "for"
   TK_INT,       // "int"
+  TK_CHAR,      // "char"
   TK_SIZEOF,    // "sizeof"
   TK_IDENT,     // 識別子
   TK_NUM,       // 整数
@@ -56,6 +58,7 @@ struct Token {
 typedef enum {
   TYPE_PTR,
   TYPE_INT,
+  TYPE_CHAR,
   TYPE_ARRAY,
 } TypeKind;
 
