@@ -91,6 +91,7 @@ try 10 "int main() { char a[10]; a[0] = 10; return a[0]; } "
 try 10 "char a() { char x; x = 42; return x; } int main() { if (42 == a()) { return 10; } else { return 20; } }"
 try 10 "char a(char c) { return c + 1; } int main() { char c; c = 2; if (a(c) == 3) { return 10; } else { return 20; } }"
 try 10 "char a(char c) { return c + 1; } int main() { if (a(2) == 3) { return 10; } else { return 20; } }"
+try 1 "int main() { char a; a = 1; return sizeof(a); }"
 
 try_foo() {
   input="$1"
