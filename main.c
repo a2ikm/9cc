@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
 
   funcs = vec_new();
   gvars = vec_new();
+  strings = vec_new();
 
   user_input = argv[1];
   tokenize();
@@ -42,6 +43,15 @@ int main(int argc, char **argv) {
     for (int i = 0; i < vec_len(gvars); i++) {
       Var *gvar = vec_get(gvars, i);
       gen_gvar(gvar);
+    }
+  }
+
+  if (vec_len(strings) > 0) {
+    for (int i = 0; i < vec_len(strings); i++) {
+      String *string = vec_get(strings, i);
+      printf("  .data\n");
+      printf("%s:\n", string->name);
+      printf("  .string \"%s\"\n", string->string);
     }
   }
 

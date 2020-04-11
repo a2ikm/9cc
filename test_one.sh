@@ -16,4 +16,4 @@ try() {
   fi
 }
 
-try 3 "int main() { int x; int *y; x = 3; y = &x; return *y; }"
+try 8 "int main() { char *s; char *t; s = \"foo\"; t = \"bar\"; return sizeof(s); }"

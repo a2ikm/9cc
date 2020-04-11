@@ -42,6 +42,7 @@ typedef enum {
   TK_SIZEOF,    // "sizeof"
   TK_IDENT,     // 識別子
   TK_NUM,       // 整数
+  TK_STRING,    // 文字列
   TK_EOF,       // EOF
 } TokenKind;
 
@@ -72,6 +73,7 @@ struct Type {
 };
 
 extern Type *int_type;
+extern Type *char_type;
 
 typedef struct Var Var;
 
@@ -82,6 +84,11 @@ struct Var {
   Type *type;
   bool is_local;
 };
+
+typedef struct String {
+  char *name;
+  char *string;
+} String;
 
 typedef enum {
   ND_ADD,
@@ -101,6 +108,7 @@ typedef enum {
   ND_LVAR,
   ND_GVAR,
   ND_NUM,
+  ND_STRING,
   ND_SIZEOF,
   ND_RETURN,
   ND_IF,
@@ -147,6 +155,7 @@ typedef struct {
 
 Vector *funcs;
 Vector *gvars;
+Vector *strings;
 
 Token *token;
 char *user_input;

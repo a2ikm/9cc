@@ -90,6 +90,26 @@ void tokenize() {
       }
     }
 
+    if (*p == '"') {
+      char *start = ++p;
+      char *end = NULL;
+
+      while (*p) {
+        if (*p == '"') {
+          end = p;
+          break;
+        }
+        p++;
+      }
+
+      if (!end)
+        error_at(start, "double quotation not found");
+
+      cur = new_token(TK_STRING, cur, start, end - start);
+      p++;
+      continue;
+    }
+
     if (match(p, "return")) {
       cur = new_token(TK_RETURN, cur, p, 6);
       p += 6;

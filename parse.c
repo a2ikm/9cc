@@ -72,6 +72,18 @@ Var *new_gvar(Token *tok, Type *type) {
   return gvar;
 }
 
+String *new_string(Token *tok) {
+  String *string = calloc(1, sizeof(String));
+  string->string = strndup(tok->str, tok->len);
+
+
+  string->name = (char *)malloc(sizeof(char) * 10);
+  sprintf(string->name, ".LC%d", vec_len(strings));
+
+  vec_add(strings, string);
+  return string;
+}
+
 Function *find_func(Token *tok) {
   for (int i = 0; i < vec_len(funcs); i++) {
     Function *fn = vec_get(funcs, i);
@@ -202,8 +214,9 @@ Node *primary() {
     return node;
   }
 
-  Token *tok = consume_ident();
-  if (tok) {
+  Token *tok = NULL;
+
+  if (tok = consume_ident()) {
     if (consume("(")) {
       Node *node = new_node(ND_CALL);
       node->name = strndup(tok->str, tok->len);
@@ -247,6 +260,14 @@ Node *primary() {
 
       return node;
     }
+  }
+
+  if (tok = consume_kind(TK_STRING)) {
+    String *string = new_string(tok);
+    Node *node = new_node(ND_STRING);
+    node->name = string->name;
+    node->type = pointer_to(char_type);
+    return node;
   }
 
   return num();
