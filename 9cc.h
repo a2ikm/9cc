@@ -159,6 +159,7 @@ Vector *strings;
 
 Token *token;
 char *user_input;
+char *filename;
 
 // tokenize.c
 void tokenize();
