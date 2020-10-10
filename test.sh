@@ -93,6 +93,11 @@ try 10 "char a(char c) { return c + 1; } int main() { char c; c = 2; if (a(c) ==
 try 10 "char a(char c) { return c + 1; } int main() { if (a(2) == 3) { return 10; } else { return 20; } }"
 try 1 "int main() { char a; a = 1; return sizeof(a); }"
 try 8 'int main() { char *s; s = "foo"; return sizeof(s); }'
+try 0 "int main() { /* this is block comment */ return 0; }"
+try 0 "int main() {
+  // this is line comment
+  return 0;
+}"
 
 try_print_ok() {
   input="$1"

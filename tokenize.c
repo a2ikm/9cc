@@ -43,6 +43,22 @@ void tokenize() {
       continue;
     }
 
+    if (strncmp(p, "//", 2) == 0) {
+      p += 2;
+      while (*p != '\n')
+        p++;
+      continue;
+    }
+
+    if (strncmp(p, "/*", 2) == 0) {
+      p += 2;
+      char *q = strstr(p + 2, "*/");
+      if (!q)
+        error_at(p, "コメントが閉じられていません");
+      p = q + 2;
+      continue;
+    }
+
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' ||
         *p == '(' || *p == ')' || *p == '{' || *p == '}' ||
         *p == '[' || *p == ']' ||
