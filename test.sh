@@ -94,13 +94,13 @@ try 10 "char a(char c) { return c + 1; } int main() { if (a(2) == 3) { return 10
 try 1 "int main() { char a; a = 1; return sizeof(a); }"
 try 8 'int main() { char *s; s = "foo"; return sizeof(s); }'
 
-try_foo() {
+try_print_ok() {
   input="$1"
 
-  gcc -c -o test/foo.o test/foo.c
+  gcc -c -o test/print_ok.o test/print_ok.c
   ./9cc "$input" > tmp.s
   gcc -c tmp.s
-  gcc -o tmp test/foo.o tmp.o
+  gcc -o tmp test/print_ok.o tmp.o
   actual=$(./tmp)
   expected=OK
   if [ "$actual" = "$expected" ]; then
@@ -111,9 +111,9 @@ try_foo() {
   fi
 }
 
-try_foo "int foo(); int main() { foo(); return 0; }"
-try_foo "int foo(); int main() { 10; foo(); return 0; }"
-try_foo "int foo(); int main() { int a; a = 10; foo(); return 0; }"
-try_foo "int foo(); int main() { int a; foo(); a = 10; return 0; }"
+try_print_ok "int print_ok(); int main() { print_ok(); return 0; }"
+try_print_ok "int print_ok(); int main() { 10; print_ok(); return 0; }"
+try_print_ok "int print_ok(); int main() { int a; a = 10; print_ok(); return 0; }"
+try_print_ok "int print_ok(); int main() { int a; print_ok(); a = 10; return 0; }"
 
 echo OK
