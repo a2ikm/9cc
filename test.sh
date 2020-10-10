@@ -116,4 +116,24 @@ try_print_ok "int print_ok(); int main() { 10; print_ok(); return 0; }"
 try_print_ok "int print_ok(); int main() { int a; a = 10; print_ok(); return 0; }"
 try_print_ok "int print_ok(); int main() { int a; print_ok(); a = 10; return 0; }"
 
+try_print() {
+  expected="$1"
+  input="$2"
+
+  gcc -c -o test/print.o test/print.c
+  ./9cc "$input" > tmp.s
+  gcc -c tmp.s
+  gcc -static -o tmp test/print.o tmp.o
+  actual=$(./tmp)
+  if [ "$actual" = "$expected" ]; then
+    echo "$input => $actual"
+  else
+    echo "$input => $expected expected, but got $actual"
+    exit 1
+  fi
+}
+
+try_print "hello" "int print(char *s); int main() { print(\"hello\n\"); return 0; }"
+try_print "hello" "int print(char *s); int main() { char *s; s = \"hello\n\"; print(s); return 0; }"
+
 echo OK
