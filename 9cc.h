@@ -14,7 +14,6 @@
 
 // helper.c
 char *strndup(const char *s, size_t n);
-
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 
