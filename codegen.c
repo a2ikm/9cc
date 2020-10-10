@@ -163,6 +163,7 @@ void gen(Node *node) {
         printf("  pop %s\n", regsq[i]);
 
       tmp_label_idx = label_idx++;
+      printf("  mov al, 0\n"); // the number of floats in arguments
       printf("  mov rax, rsp\n");
       printf("  and rax, 0xF\n");
       printf("  jnz .L.call.%d\n", tmp_label_idx);
