@@ -100,7 +100,7 @@ try_print_ok() {
   gcc -c -o test/print_ok.o test/print_ok.c
   ./9cc "$input" > tmp.s
   gcc -c tmp.s
-  gcc -o tmp test/print_ok.o tmp.o
+  gcc -static -o tmp test/print_ok.o tmp.o
   actual=$(./tmp)
   expected=OK
   if [ "$actual" = "$expected" ]; then
