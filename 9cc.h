@@ -167,7 +167,8 @@ void tokenize();
 void parse();
 
 // codegen.c
-void gen(Node *node);
-void gen_gvar(Var *gvar);
+void emit_bss();
+void emit_data();
+void emit_text();
 
 #endif

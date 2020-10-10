@@ -36,31 +36,10 @@ int main(int argc, char **argv) {
   tokenize();
   parse();
 
-  printf(".intel_syntax noprefix\n");
-
-  if (vec_len(gvars) > 0) {
-    printf(".bss\n");
-    for (int i = 0; i < vec_len(gvars); i++) {
-      Var *gvar = vec_get(gvars, i);
-      gen_gvar(gvar);
-    }
-  }
-
-  if (vec_len(strings) > 0) {
-    for (int i = 0; i < vec_len(strings); i++) {
-      String *string = vec_get(strings, i);
-      printf("  .data\n");
-      printf("%s:\n", string->name);
-      printf("  .string \"%s\"\n", string->string);
-    }
-  }
-
-  printf(".text\n");
-  for (int i = 0; i < vec_len(funcs); i++) {
-    Function *fn = vec_get(funcs, i);
-    if (fn->node)
-      gen(fn->node);
-  }
+  printf("  .intel_syntax noprefix\n");
+  emit_bss();
+  emit_data();
+  emit_text();
 
   return 0;
 }

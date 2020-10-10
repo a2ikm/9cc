@@ -277,3 +277,33 @@ void gen_gvar(Var *gvar) {
   printf("%s:\n", gvar->name);
   printf("  .zero %ld\n", gvar->type->size);
 }
+
+void emit_bss() {
+  if (vec_len(gvars) == 0) return;
+
+  printf("  .bss\n");
+  for (int i = 0; i < vec_len(gvars); i++) {
+    Var *gvar = vec_get(gvars, i);
+    gen_gvar(gvar);
+  }
+}
+
+void emit_data() {
+  if (vec_len(strings) == 0) return;
+
+  for (int i = 0; i < vec_len(strings); i++) {
+    String *string = vec_get(strings, i);
+    printf("  .data\n");
+    printf("%s:\n", string->name);
+    printf("  .string \"%s\"\n", string->string);
+  }
+}
+
+void emit_text() {
+  printf("  .text\n");
+  for (int i = 0; i < vec_len(funcs); i++) {
+    Function *fn = vec_get(funcs, i);
+    if (fn->node)
+      gen(fn->node);
+  }
+}
