@@ -3,7 +3,7 @@ try() {
   expected="$1"
   input="$2"
 
-  ./9cc "$input" > tmp.s
+  echo "$input" | ./9cc - > tmp.s
   gcc -static -o tmp tmp.s
   ./tmp
   actual="$?"
@@ -98,7 +98,7 @@ try_print_ok() {
   input="$1"
 
   gcc -c -o test/print_ok.o test/print_ok.c
-  ./9cc "$input" > tmp.s
+  echo "$input" | ./9cc - > tmp.s
   gcc -c tmp.s
   gcc -static -o tmp test/print_ok.o tmp.o
   actual=$(./tmp)
@@ -121,7 +121,7 @@ try_print() {
   input="$2"
 
   gcc -c -o test/print.o test/print.c
-  ./9cc "$input" > tmp.s
+  echo "$input" | ./9cc - > tmp.s
   gcc -c tmp.s
   gcc -static -o tmp test/print.o tmp.o
   actual=$(./tmp)
