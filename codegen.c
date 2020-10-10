@@ -6,6 +6,8 @@ char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8",  "r9" };
 
 unsigned int label_idx = 0;
 
+void gen(Node *node);
+
 void gen_lval(Node *node) {
   switch(node->kind) {
     case ND_GVAR:
