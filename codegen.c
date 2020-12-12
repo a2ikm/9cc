@@ -1,7 +1,5 @@
 #include "9cc.h"
 
-#define ENOUGH ((8 * sizeof(long) - 1) / 3 + 2)
-
 char *regsb[] = { "dil", "sil", "dl",  "cl",  "r8b", "r9b" };
 char *regsd[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
 char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8",  "r9" };
@@ -86,12 +84,11 @@ void store(Type *type) {
 
 void gen(Node *node) {
   unsigned int tmp_label_idx;
-  char s[ENOUGH];
 
   switch(node->kind) {
     case ND_NUM:
-      sprintf(s, "%d",  node->val);
-      push(s);
+      println(" mov rax, %d", node->val);
+      push("rax");
       return;
     case ND_STRING:
       println("  lea rax, %s", node->name);
@@ -117,8 +114,8 @@ void gen(Node *node) {
       store(node->type);
       return;
     case ND_SIZEOF:
-      sprintf(s, "%ld",  node->lhs->type->size);
-      push(s);
+      println("  mov rax, %ld", node->lhs->type->size);
+      push("rax");
       return;
     case ND_RETURN:
       gen(node->lhs);
