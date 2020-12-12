@@ -6,6 +6,7 @@ char *regsb[] = { "dil", "sil", "dl",  "cl",  "r8b", "r9b" };
 char *regsd[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
 char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8",  "r9" };
 
+int depth = 0;
 unsigned int label_idx = 0;
 
 void gen(Node *node);
@@ -20,10 +21,12 @@ void println(char *fmt, ...) {
 
 void push(char *arg) {
   println("  push %s", arg);
+  depth++;
 }
 
 void pop(char *arg) {
   println("  pop %s", arg);
+  depth--;
 }
 
 void gen_lval(Node *node) {
@@ -186,19 +189,18 @@ void gen(Node *node) {
         pop(regsq[i]);
 
       tmp_label_idx = label_idx++;
+
+      bool need_padding = depth % 2 == 1;
+      if (need_padding)
+        println("  sub rsp, 8");
+
       println("  mov al, 0"); // the number of floats in arguments
-      println("  mov rax, rsp");
-      println("  and rax, 0xF");
-      println("  jnz .L.call.%d", tmp_label_idx);
       println("  mov rax, 0");
       println("  call %s", node->name);
-      println("  jmp .L.end.%d", tmp_label_idx);
-      println(".L.call.%d:", tmp_label_idx);
-      println("  sub rsp, 8");
-      println("  mov rax, 0");
-      println("  call %s", node->name);
-      println("  add rsp, 8");
-      println(".L.end.%d:", tmp_label_idx);
+
+      if (need_padding)
+        println("  add rsp, 8");
+
       push("rax");
       return;
     case ND_FUNC:
