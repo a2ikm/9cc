@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+#define ENOUGH ((8 * sizeof(long) - 1) / 3 + 2)
+
 char *regsb[] = { "dil", "sil", "dl",  "cl",  "r8b", "r9b" };
 char *regsd[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
 char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8",  "r9" };
@@ -16,17 +18,25 @@ void println(char *fmt, ...) {
   printf("\n");
 }
 
+void push(char *arg) {
+  println("  push %s", arg);
+}
+
+void pop(char *arg) {
+  println("  pop %s", arg);
+}
+
 void gen_lval(Node *node) {
   switch(node->kind) {
     case ND_GVAR:
       println("  lea rax, %s[rip]", node->name);
-      println("  push rax");
+      push("rax");
       return;
     case ND_LVAR:
     case ND_ADDR:
       println("  mov rax, rbp");
       println("  sub rax, %d", node->offset);
-      println("  push rax");
+      push("rax");
       return;
     case ND_DEREF:
       gen(node->lhs);
@@ -37,7 +47,7 @@ void gen_lval(Node *node) {
 }
 
 void load(Type *type) {
-  println("  pop rax");
+  pop("rax");
 
   switch (type->size) {
     case DWORD_SIZE:
@@ -50,12 +60,12 @@ void load(Type *type) {
       println("  mov rax, [rax]");
   }
 
-  println("  push rax");
+  push("rax");
 }
 
 void store(Type *type) {
-  println("  pop rdi");
-  println("  pop rax");
+  pop("rdi");
+  pop("rax");
 
   switch (type->size) {
     case DWORD_SIZE:
@@ -68,20 +78,22 @@ void store(Type *type) {
       println("  mov [rax], rdi");
   }
 
-  println("  push rdi");
+  push("rdi");
 }
 
 void gen(Node *node) {
   unsigned int tmp_label_idx;
   int frame_size = 0;
+  char s[ENOUGH];
 
   switch(node->kind) {
     case ND_NUM:
-      println("  push %d", node->val);
+      sprintf(s, "%d",  node->val);
+      push(s);
       return;
     case ND_STRING:
       println("  lea rax, %s", node->name);
-      println("  push rax");
+      push("rax");
       return;
     case ND_GVAR:
     case ND_LVAR:
@@ -103,13 +115,14 @@ void gen(Node *node) {
       store(node->type);
       return;
     case ND_SIZEOF:
-      println("  push %ld", node->lhs->type->size);
+      sprintf(s, "%ld",  node->lhs->type->size);
+      push(s);
       return;
     case ND_RETURN:
       gen(node->lhs);
-      println("  pop rax");
+      pop("rax");
       println("  mov rsp, rbp");
-      println("  pop rbp");
+      pop("rbp");
       println("  ret");
       return;
     case ND_IF:
@@ -117,7 +130,7 @@ void gen(Node *node) {
 
       if (node->alternative) {
         gen(node->condition);
-        println("  pop rax");
+        pop("rax");
         println("  cmp rax, 0");
         println("  je  .Lelse%d", tmp_label_idx);
         gen(node->consequence);
@@ -127,7 +140,7 @@ void gen(Node *node) {
         println(".Lend%d:", tmp_label_idx);
       } else {
         gen(node->condition);
-        println("  pop rax");
+        pop("rax");
         println("  cmp rax, 0");
         println("  je  .Lend%d", tmp_label_idx);
         gen(node->consequence);
@@ -138,7 +151,7 @@ void gen(Node *node) {
       tmp_label_idx = label_idx++;
       println(".Lbegin%d:", tmp_label_idx);
       gen(node->condition);
-      println("  pop rax");
+      pop("rax");
       println("  cmp rax, 0");
       println("  je  .Lend%d", tmp_label_idx);
       gen(node->consequence);
@@ -150,7 +163,7 @@ void gen(Node *node) {
       gen(node->initialization);
       println(".Lbegin%d:", tmp_label_idx);
       gen(node->condition);
-      println("  pop rax");
+      pop("rax");
       println("  cmp rax, 0");
       println("  je  .Lend%d", tmp_label_idx);
       gen(node->consequence);
@@ -161,16 +174,16 @@ void gen(Node *node) {
     case ND_BLOCK:
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
-        println("  pop rax");
+        pop("rax");
       }
-      println("  push rax");
+      push("rax");
       return;
     case ND_CALL:
       for (int i = 0; i < vec_len(node->args); i++)
         gen((Node *)vec_get(node->args, i));
 
       for (int i = vec_len(node->args) - 1; i >= 0; i--)
-        println("  pop %s", regsq[i]);
+        pop(regsq[i]);
 
       tmp_label_idx = label_idx++;
       println("  mov al, 0"); // the number of floats in arguments
@@ -186,12 +199,12 @@ void gen(Node *node) {
       println("  call %s", node->name);
       println("  add rsp, 8");
       println(".L.end.%d:", tmp_label_idx);
-      println("  push rax");
+      push("rax");
       return;
     case ND_FUNC:
       println(".global %s", node->name);
       println("%s:", node->name);
-      println("  push rbp");
+      push("rbp");
       println("  mov rbp, rsp");
 
       size_t frame_size = 0;
@@ -216,19 +229,19 @@ void gen(Node *node) {
 
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
-        println("  pop rax");
+        pop("rax");
       }
       return;
     case ND_VAR_DECLARE:
-      println("  push rax");
+      push("rax");
       return;
   }
 
   gen(node->lhs);
   gen(node->rhs);
 
-  println("  pop rdi");
-  println("  pop rax");
+  pop("rdi");
+  pop("rax");
 
   switch (node->kind) {
     case ND_ADD:
@@ -280,7 +293,7 @@ void gen(Node *node) {
       break;
   }
 
-  println("  push rax");
+  push("rax");
 }
 
 void gen_gvar(Var *gvar) {
