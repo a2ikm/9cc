@@ -8,17 +8,25 @@ unsigned int label_idx = 0;
 
 void gen(Node *node);
 
+void println(char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  vprintf(fmt, ap);
+  va_end(ap);
+  printf("\n");
+}
+
 void gen_lval(Node *node) {
   switch(node->kind) {
     case ND_GVAR:
-      printf("  lea rax, %s[rip]\n", node->name);
-      printf("  push rax\n");
+      println("  lea rax, %s[rip]", node->name);
+      println("  push rax");
       return;
     case ND_LVAR:
     case ND_ADDR:
-      printf("  mov rax, rbp\n");
-      printf("  sub rax, %d\n", node->offset);
-      printf("  push rax\n");
+      println("  mov rax, rbp");
+      println("  sub rax, %d", node->offset);
+      println("  push rax");
       return;
     case ND_DEREF:
       gen(node->lhs);
@@ -29,38 +37,38 @@ void gen_lval(Node *node) {
 }
 
 void load(Type *type) {
-  printf("  pop rax\n");
+  println("  pop rax");
 
   switch (type->size) {
     case DWORD_SIZE:
-      printf("  movsxd rax, dword ptr [rax]\n");
+      println("  movsxd rax, dword ptr [rax]");
       break;
     case BYTE_SIZE:
-      printf("  movsx rax, byte ptr [rax]\n");
+      println("  movsx rax, byte ptr [rax]");
       break;
     default:
-      printf("  mov rax, [rax]\n");
+      println("  mov rax, [rax]");
   }
 
-  printf("  push rax\n");
+  println("  push rax");
 }
 
 void store(Type *type) {
-  printf("  pop rdi\n");
-  printf("  pop rax\n");
+  println("  pop rdi");
+  println("  pop rax");
 
   switch (type->size) {
     case DWORD_SIZE:
-      printf("  mov [rax], edi\n");
+      println("  mov [rax], edi");
       break;
     case BYTE_SIZE:
-      printf("  mov [rax], dil\n");
+      println("  mov [rax], dil");
       break;
     default:
-      printf("  mov [rax], rdi\n");
+      println("  mov [rax], rdi");
   }
 
-  printf("  push rdi\n");
+  println("  push rdi");
 }
 
 void gen(Node *node) {
@@ -69,11 +77,11 @@ void gen(Node *node) {
 
   switch(node->kind) {
     case ND_NUM:
-      printf("  push %d\n", node->val);
+      println("  push %d", node->val);
       return;
     case ND_STRING:
-      printf("  lea rax, %s\n", node->name);
-      printf("  push rax\n");
+      println("  lea rax, %s", node->name);
+      println("  push rax");
       return;
     case ND_GVAR:
     case ND_LVAR:
@@ -95,195 +103,195 @@ void gen(Node *node) {
       store(node->type);
       return;
     case ND_SIZEOF:
-      printf("  push %ld\n", node->lhs->type->size);
+      println("  push %ld", node->lhs->type->size);
       return;
     case ND_RETURN:
       gen(node->lhs);
-      printf("  pop rax\n");
-      printf("  mov rsp, rbp\n");
-      printf("  pop rbp\n");
-      printf("  ret\n");
+      println("  pop rax");
+      println("  mov rsp, rbp");
+      println("  pop rbp");
+      println("  ret");
       return;
     case ND_IF:
       tmp_label_idx = label_idx++;
 
       if (node->alternative) {
         gen(node->condition);
-        printf("  pop rax\n");
-        printf("  cmp rax, 0\n");
-        printf("  je  .Lelse%d\n", tmp_label_idx);
+        println("  pop rax");
+        println("  cmp rax, 0");
+        println("  je  .Lelse%d", tmp_label_idx);
         gen(node->consequence);
-        printf("  jmp .Lend%d\n", tmp_label_idx);
-        printf(".Lelse%d:\n", tmp_label_idx);
+        println("  jmp .Lend%d", tmp_label_idx);
+        println(".Lelse%d:", tmp_label_idx);
         gen(node->alternative);
-        printf(".Lend%d:\n", tmp_label_idx);
+        println(".Lend%d:", tmp_label_idx);
       } else {
         gen(node->condition);
-        printf("  pop rax\n");
-        printf("  cmp rax, 0\n");
-        printf("  je  .Lend%d\n", tmp_label_idx);
+        println("  pop rax");
+        println("  cmp rax, 0");
+        println("  je  .Lend%d", tmp_label_idx);
         gen(node->consequence);
-        printf(".Lend%d:\n", tmp_label_idx);
+        println(".Lend%d:", tmp_label_idx);
       }
       return;
     case ND_WHILE:
       tmp_label_idx = label_idx++;
-      printf(".Lbegin%d:\n", tmp_label_idx);
+      println(".Lbegin%d:", tmp_label_idx);
       gen(node->condition);
-      printf("  pop rax\n");
-      printf("  cmp rax, 0\n");
-      printf("  je  .Lend%d\n", tmp_label_idx);
+      println("  pop rax");
+      println("  cmp rax, 0");
+      println("  je  .Lend%d", tmp_label_idx);
       gen(node->consequence);
-      printf("  jmp .Lbegin%d\n", tmp_label_idx);
-      printf(".Lend%d:\n", tmp_label_idx);
+      println("  jmp .Lbegin%d", tmp_label_idx);
+      println(".Lend%d:", tmp_label_idx);
       return;
     case ND_FOR:
       tmp_label_idx = label_idx++;
       gen(node->initialization);
-      printf(".Lbegin%d:\n", tmp_label_idx);
+      println(".Lbegin%d:", tmp_label_idx);
       gen(node->condition);
-      printf("  pop rax\n");
-      printf("  cmp rax, 0\n");
-      printf("  je  .Lend%d\n", tmp_label_idx);
+      println("  pop rax");
+      println("  cmp rax, 0");
+      println("  je  .Lend%d", tmp_label_idx);
       gen(node->consequence);
       gen(node->increment);
-      printf("  jmp .Lbegin%d\n", tmp_label_idx);
-      printf(".Lend%d:\n", tmp_label_idx);
+      println("  jmp .Lbegin%d", tmp_label_idx);
+      println(".Lend%d:", tmp_label_idx);
       return;
     case ND_BLOCK:
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
-        printf("  pop rax\n");
+        println("  pop rax");
       }
-      printf("  push rax\n");
+      println("  push rax");
       return;
     case ND_CALL:
       for (int i = 0; i < vec_len(node->args); i++)
         gen((Node *)vec_get(node->args, i));
 
       for (int i = vec_len(node->args) - 1; i >= 0; i--)
-        printf("  pop %s\n", regsq[i]);
+        println("  pop %s", regsq[i]);
 
       tmp_label_idx = label_idx++;
-      printf("  mov al, 0\n"); // the number of floats in arguments
-      printf("  mov rax, rsp\n");
-      printf("  and rax, 0xF\n");
-      printf("  jnz .L.call.%d\n", tmp_label_idx);
-      printf("  mov rax, 0\n");
-      printf("  call %s\n", node->name);
-      printf("  jmp .L.end.%d\n", tmp_label_idx);
-      printf(".L.call.%d:\n", tmp_label_idx);
-      printf("  sub rsp, 8\n");
-      printf("  mov rax, 0\n");
-      printf("  call %s\n", node->name);
-      printf("  add rsp, 8\n");
-      printf(".L.end.%d:\n", tmp_label_idx);
-      printf("  push rax\n");
+      println("  mov al, 0"); // the number of floats in arguments
+      println("  mov rax, rsp");
+      println("  and rax, 0xF");
+      println("  jnz .L.call.%d", tmp_label_idx);
+      println("  mov rax, 0");
+      println("  call %s", node->name);
+      println("  jmp .L.end.%d", tmp_label_idx);
+      println(".L.call.%d:", tmp_label_idx);
+      println("  sub rsp, 8");
+      println("  mov rax, 0");
+      println("  call %s", node->name);
+      println("  add rsp, 8");
+      println(".L.end.%d:", tmp_label_idx);
+      println("  push rax");
       return;
     case ND_FUNC:
-      printf(".global %s\n", node->name);
-      printf("%s:\n", node->name);
-      printf("  push rbp\n");
-      printf("  mov rbp, rsp\n");
+      println(".global %s", node->name);
+      println("%s:", node->name);
+      println("  push rbp");
+      println("  mov rbp, rsp");
 
       size_t frame_size = 0;
       for (int i = 0; i < vec_len(node->lvars); i++)
         frame_size += ((Var *)vec_get(node->lvars, i))->type->size;
       if (frame_size > 0)
-        printf("  sub rsp, %ld\n", frame_size);
+        println("  sub rsp, %ld", frame_size);
 
       for (int i = 0; i < vec_len(node->params); i++) {
         Var *lvar = vec_get(node->params, i);
         switch (lvar->type->size) {
           case DWORD_SIZE:
-            printf("  mov [rbp-%d], %s\n", lvar->offset, regsd[i]);
+            println("  mov [rbp-%d], %s", lvar->offset, regsd[i]);
             break;
           case BYTE_SIZE:
-            printf("  mov [rbp-%d], %s\n", lvar->offset, regsb[i]);
+            println("  mov [rbp-%d], %s", lvar->offset, regsb[i]);
             break;
           default:
-            printf("  mov [rbp-%d], %s\n", lvar->offset, regsq[i]);
+            println("  mov [rbp-%d], %s", lvar->offset, regsq[i]);
         }
       }
 
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
-        printf("  pop rax\n");
+        println("  pop rax");
       }
       return;
     case ND_VAR_DECLARE:
-      printf("  push rax\n");
+      println("  push rax");
       return;
   }
 
   gen(node->lhs);
   gen(node->rhs);
 
-  printf("  pop rdi\n");
-  printf("  pop rax\n");
+  println("  pop rdi");
+  println("  pop rax");
 
   switch (node->kind) {
     case ND_ADD:
-      printf("  add rax, rdi\n");
+      println("  add rax, rdi");
       break;
     case ND_SUB:
-      printf("  sub rax, rdi\n");
+      println("  sub rax, rdi");
       break;
     case ND_MUL:
-      printf("  imul rax, rdi\n");
+      println("  imul rax, rdi");
       break;
     case ND_DIV:
-      printf("  cqo\n");
-      printf("  idiv rdi\n");
+      println("  cqo");
+      println("  idiv rdi");
       break;
     case ND_PTR_ADD:
-      printf("  imul rdi, %ld\n", node->lhs->type->base->size);
-      printf("  add rax, rdi\n");
+      println("  imul rdi, %ld", node->lhs->type->base->size);
+      println("  add rax, rdi");
       break;
     case ND_PTR_SUB:
-      printf("  imul rdi, %ld\n", node->lhs->type->base->size);
-      printf("  sub rax, rdi\n");
+      println("  imul rdi, %ld", node->lhs->type->base->size);
+      println("  sub rax, rdi");
       break;
     case ND_PTR_DIFF:
-      printf("  sub rax, rdi\n");
-      printf("  mov rdi, %ld\n", node->lhs->type->base->size);
-      printf("  cqo\n");
-      printf("  idiv rdi\n");
+      println("  sub rax, rdi");
+      println("  mov rdi, %ld", node->lhs->type->base->size);
+      println("  cqo");
+      println("  idiv rdi");
       break;
     case ND_EQ:
-      printf("  cmp rax, rdi\n");
-      printf("  sete al\n");
-      printf("  movzb rax, al\n");
+      println("  cmp rax, rdi");
+      println("  sete al");
+      println("  movzb rax, al");
       break;
     case ND_NEQ:
-      printf("  cmp rax, rdi\n");
-      printf("  setne al\n");
-      printf("  movzb rax, al\n");
+      println("  cmp rax, rdi");
+      println("  setne al");
+      println("  movzb rax, al");
       break;
     case ND_LT:
-      printf("  cmp rax, rdi\n");
-      printf("  setl al\n");
-      printf("  movzb rax, al\n");
+      println("  cmp rax, rdi");
+      println("  setl al");
+      println("  movzb rax, al");
       break;
     case ND_LTEQ:
-      printf("  cmp rax, rdi\n");
-      printf("  setle al\n");
-      printf("  movzb rax, al\n");
+      println("  cmp rax, rdi");
+      println("  setle al");
+      println("  movzb rax, al");
       break;
   }
 
-  printf("  push rax\n");
+  println("  push rax");
 }
 
 void gen_gvar(Var *gvar) {
-  printf("%s:\n", gvar->name);
-  printf("  .zero %ld\n", gvar->type->size);
+  println("%s:", gvar->name);
+  println("  .zero %ld", gvar->type->size);
 }
 
 void emit_bss() {
   if (vec_len(gvars) == 0) return;
 
-  printf("  .bss\n");
+  println("  .bss");
   for (int i = 0; i < vec_len(gvars); i++) {
     Var *gvar = vec_get(gvars, i);
     gen_gvar(gvar);
@@ -295,14 +303,14 @@ void emit_data() {
 
   for (int i = 0; i < vec_len(strings); i++) {
     String *string = vec_get(strings, i);
-    printf("  .data\n");
-    printf("%s:\n", string->name);
-    printf("  .string \"%s\"\n", string->string);
+    println("  .data");
+    println("%s:", string->name);
+    println("  .string \"%s\"", string->string);
   }
 }
 
 void emit_text() {
-  printf("  .text\n");
+  println("  .text");
   for (int i = 0; i < vec_len(funcs); i++) {
     Function *fn = vec_get(funcs, i);
     if (fn->node)
