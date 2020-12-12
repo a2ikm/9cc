@@ -86,7 +86,6 @@ void store(Type *type) {
 
 void gen(Node *node) {
   unsigned int tmp_label_idx;
-  int frame_size = 0;
   char s[ENOUGH];
 
   switch(node->kind) {
