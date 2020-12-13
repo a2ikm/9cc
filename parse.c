@@ -77,7 +77,8 @@ String *new_string(Token *tok) {
   string->string = strndup(tok->str, tok->len);
 
 
-  string->name = (char *)malloc(sizeof(char) * 10);
+  int len = snprintf(NULL, 0, ".LC%d", vec_len(strings));
+  string->name = (char *)malloc(sizeof(char) * (len + 1));
   sprintf(string->name, ".LC%d", vec_len(strings));
 
   vec_add(strings, string);
