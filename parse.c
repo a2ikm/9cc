@@ -495,7 +495,7 @@ Node *stmt() {
 void func() {
   Type *type = detect_type();
   if (!type)
-    error("syntax error");
+    error_at(token->str, "Type detection failure");
 
   while (!at_eof()) {
     if (consume("*")) {
@@ -522,7 +522,7 @@ void func() {
       while (!at_eof()) {
         Type *type = detect_type();
         if (!type)
-          error("syntax error");
+          error_at(token->str, "Type detection failure");
         while (!at_eof()) {
           if (consume("*")) {
             type = pointer_to(type);
