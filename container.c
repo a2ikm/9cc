@@ -4,7 +4,7 @@ void extend(Vector *vec, int count) {
   if (vec->len + count <= vec->size)
     return;
   vec->size *= 2;
-  vec->data = realloc(vec->data, vec->size);
+  vec->data = realloc(vec->data, sizeof(void *) * vec->size);
 }
 
 Vector *vec_new() {
