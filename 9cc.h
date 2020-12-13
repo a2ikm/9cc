@@ -75,15 +75,13 @@ struct Type {
 extern Type *int_type;
 extern Type *char_type;
 
-typedef struct Var Var;
-
-struct Var {
+typedef struct Var {
   char *name;
   int len;
   int offset;
   Type *type;
   bool is_local;
-};
+} Var;
 
 typedef struct String {
   char *name;

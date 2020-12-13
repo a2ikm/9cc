@@ -3,6 +3,21 @@
 Type *int_type = &(Type){ TYPE_INT, DWORD_SIZE, NULL };
 Type *char_type = &(Type){ TYPE_CHAR, BYTE_SIZE, NULL };
 
+typedef struct Env {
+  Vector *vars;
+  struct Env *prev;
+} Env;
+
+Env *env;
+Vector *lvars;
+
+Env *new_env(Env *prev) {
+  Env *env = calloc(1, sizeof(Env));
+  env->vars = vec_new();
+  env->prev = prev;
+  return env;
+}
+
 bool is_integer(Type *type) {
   return type->kind == TYPE_INT || type->kind == TYPE_CHAR;
 }
@@ -30,13 +45,13 @@ Var *new_var(Token *tok, Type *type) {
   return var;
 }
 
-Vector *lvars;
-
-Var *find_lvar(Token *tok) {
-  for (int i = 0; i < vec_len(lvars); i++) {
-    Var *lvar = vec_get(lvars, i);
-    if (lvar->len == tok->len && !memcmp(tok->str, lvar->name, lvar->len))
-      return lvar;
+Var *find_var(Token *tok) {
+  for (Env *e = env; e; e = e->prev) {
+    for (int i = 0; i < vec_len(e->vars); i++) {
+      Var *var = vec_get(e->vars, i);
+      if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+        return var;
+    }
   }
   return NULL;
 }
@@ -51,23 +66,16 @@ Var *new_lvar(Token *tok, Type *type) {
   else
     lvar->offset = lvar->type->size;
 
+  vec_add(env->vars, lvar);
   vec_add(lvars, lvar);
   return lvar;
-}
-
-Var *find_gvar(Token *tok) {
-  for (int i = 0; i < vec_len(gvars); i++) {
-    Var *gvar = vec_get(gvars, i);
-    if (gvar->len == tok->len && !memcmp(tok->str, gvar->name, gvar->len))
-      return gvar;
-  }
-  return NULL;
 }
 
 Var *new_gvar(Token *tok, Type *type) {
   Var *gvar = new_var(tok, type);
   gvar->is_local = false;
 
+  vec_add(env->vars, gvar);
   vec_add(gvars, gvar);
   return gvar;
 }
@@ -238,11 +246,13 @@ Node *primary() {
       Var *var;
       Node *node;
 
-      if (var = find_lvar(tok)) {
-        node = new_node(ND_LVAR);
-        node->offset = var->offset;
-      } else if (var = find_gvar(tok)) {
-        node = new_node(ND_GVAR);
+      if (var = find_var(tok)) {
+        if (var->is_local) {
+          node = new_node(ND_LVAR);
+          node->offset = var->offset;
+        } else {
+          node = new_node(ND_GVAR);
+        }
       } else {
         error_at(tok->str, "Unknown variable");
       }
@@ -575,5 +585,6 @@ void program() {
 }
 
 void parse() {
+  env = new_env(NULL);
   program();
 }
