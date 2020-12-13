@@ -1,5 +1,7 @@
 *~
 *.o
+*.s
 tmp*
 a.out
 9cc
+test/*.exe
