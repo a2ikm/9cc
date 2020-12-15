@@ -87,7 +87,7 @@ void gen(Node *node) {
 
   switch(node->kind) {
     case ND_NUM:
-      println(" mov rax, %d", node->val);
+      println("  mov rax, %d", node->val);
       push("rax");
       return;
     case ND_STRING:
