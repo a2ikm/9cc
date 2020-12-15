@@ -177,8 +177,6 @@ void gen(Node *node) {
       for (int i = vec_len(node->args) - 1; i >= 0; i--)
         pop(regsq[i]);
 
-      tmp_label_idx = label_idx++;
-
       bool need_padding = depth % 2 == 1;
       if (need_padding)
         println("  sub rsp, 8");
