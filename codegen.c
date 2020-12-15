@@ -127,24 +127,17 @@ void gen(Node *node) {
     case ND_IF:
       tmp_label_idx = label_idx++;
 
+      gen(node->condition);
+      pop("rax");
+      println("  cmp rax, 0");
+      println("  je  .Lelse%d", tmp_label_idx);
+      gen(node->consequence);
+      println("  jmp .Lend%d", tmp_label_idx);
+      println(".Lelse%d:", tmp_label_idx);
       if (node->alternative) {
-        gen(node->condition);
-        pop("rax");
-        println("  cmp rax, 0");
-        println("  je  .Lelse%d", tmp_label_idx);
-        gen(node->consequence);
-        println("  jmp .Lend%d", tmp_label_idx);
-        println(".Lelse%d:", tmp_label_idx);
         gen(node->alternative);
-        println(".Lend%d:", tmp_label_idx);
-      } else {
-        gen(node->condition);
-        pop("rax");
-        println("  cmp rax, 0");
-        println("  je  .Lend%d", tmp_label_idx);
-        gen(node->consequence);
-        println(".Lend%d:", tmp_label_idx);
       }
+      println(".Lend%d:", tmp_label_idx);
       return;
     case ND_WHILE:
       tmp_label_idx = label_idx++;
