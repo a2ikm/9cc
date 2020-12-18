@@ -116,6 +116,7 @@ typedef enum {
   ND_CALL,
   ND_FUNC,
   ND_VAR_DECLARE,
+  ND_EXPR_STMT,
 } NodeKind;
 
 typedef struct Node Node;

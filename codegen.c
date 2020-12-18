@@ -166,9 +166,7 @@ void gen(Node *node) {
     case ND_BLOCK:
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
-        pop("rax");
       }
-      push("rax");
       return;
     case ND_CALL:
       for (int i = 0; i < vec_len(node->args); i++)
@@ -218,11 +216,12 @@ void gen(Node *node) {
 
       for (int i = 0; i < vec_len(node->stmts); i++) {
         gen((Node *)vec_get(node->stmts, i));
-        pop("rax");
       }
       return;
     case ND_VAR_DECLARE:
-      push("rax");
+      return;
+    case ND_EXPR_STMT:
+      gen(node->lhs);
       return;
   }
 

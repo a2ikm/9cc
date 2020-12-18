@@ -424,8 +424,17 @@ Node *assign() {
   return node;
 }
 
+// expr = assign
 Node *expr() {
   return assign();
+}
+
+// expr-stmt = expr? ";"
+Node *expr_stmt() {
+  Node *node = new_node(ND_EXPR_STMT);
+  node->lhs = expr();
+  expect(";");
+  return node;
 }
 
 Node *stmt() {
@@ -498,9 +507,7 @@ Node *stmt() {
     return node;
   }
 
-  node = expr();
-  expect(";");
-  return node;
+  return expr_stmt();
 }
 
 void func() {

@@ -16,6 +16,7 @@ try() {
   fi
 }
 
+try 0 "int main () { int a; a = 0; if (0) a = 1; return a; }"
 try 0 "int main() { return 0; }"
 try 42 "int main() { return 42; }"
 try 21 "int main() { return 5+20-4; }"
