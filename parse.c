@@ -227,9 +227,14 @@ Node *primary() {
 
   if (tok = consume_ident()) {
     if (consume("(")) {
+      Function *fn = find_func(tok);
+      if (!fn) {
+        error_at(tok->str, "Calling unknown function");
+      }
+
       Node *node = new_node(ND_CALL);
       node->name = strndup(tok->str, tok->len);
-      node->type = find_func(tok)->type;
+      node->type = fn->type;
       node->args = vec_new();
 
       // parse args
