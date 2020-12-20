@@ -215,6 +215,7 @@ Node *num() {
 
 Node *expr();
 Node *new_add(Node *lhs, Node *rhs);
+Node *compound_stmt();
 
 Node *primary() {
   if (consume("(")) {
@@ -442,6 +443,12 @@ Node *expr_stmt() {
   return node;
 }
 
+// stmt = "if" "(" expr ")" ("else" stmt)?
+//      | "while" "(" expr ")" stmt
+//      | "for" "(" expr ";" expr ";" expr ")" stmt
+//      | "{" compound-stmt
+//      | "return" expr ";"
+//      | expr-stmt
 Node *stmt() {
   Node *node;
 
@@ -474,14 +481,7 @@ Node *stmt() {
     node->consequence = stmt();
     return node;
   } else if (consume("{")) {
-    Node *node = new_node(ND_BLOCK);
-    node->stmts = vec_new();
-    while (!at_eof()) {
-      if (consume("}"))
-        break;
-      vec_add(node->stmts, (void *)stmt());
-    }
-    return node;
+    return compound_stmt();
   } else if (consume_kind(TK_RETURN)) {
     Node *node = new_node(ND_RETURN);
     node->lhs = expr();
@@ -489,32 +489,50 @@ Node *stmt() {
     return node;
   }
 
-  Type *type = detect_type();
-  if (type) {
-    while (!at_eof()) {
-      if (consume("*")) {
-        type = pointer_to(type);
-        continue;
-      }
-      break;
-    }
-    Token *tok = expect_kind(TK_IDENT);
-    if (consume("[")) {
-      int array_size = expect_number();
-      type = array_of(type, array_size);
-      expect("]");
-    }
-    new_lvar(tok, type);
-    Node *node = new_node(ND_VAR_DECLARE);
-    node->name = strndup(tok->str, tok->len);
-    node->type = type;
-    expect(";");
-    return node;
-  }
-
   return expr_stmt();
 }
 
+Node *declaration(Type *type) {
+  Node *node = new_node(ND_VAR_DECLARE);
+  while (!at_eof()) {
+    if (consume("*")) {
+      type = pointer_to(type);
+      continue;
+    }
+    break;
+  }
+  Token *tok = expect_kind(TK_IDENT);
+  if (consume("[")) {
+    int array_size = expect_number();
+    type = array_of(type, array_size);
+    expect("]");
+  }
+  new_lvar(tok, type);
+  node->name = strndup(tok->str, tok->len);
+  node->type = type;
+  expect(";");
+  return node;
+}
+
+// compound-stmt = (declaration | stmt)* "}"
+Node *compound_stmt() {
+  Node *node = new_node(ND_BLOCK);
+  node->stmts = vec_new();
+  while(!at_eof()) {
+    if (consume("}"))
+      break;
+    Type *type = detect_type();
+    if (type) {
+      vec_add(node->stmts, declaration(type));
+    } else {
+      vec_add(node->stmts, stmt());
+    }
+  }
+  return node;
+}
+
+// func = typename ident "(" (typename ident ("," typename ident)*)? ")" "{" compound-stmt
+//      | typename ident "(" (typename ident ("," typename ident)*)? ")" ";"
 void func() {
   Type *type = detect_type();
   if (!type)
@@ -574,11 +592,7 @@ void func() {
     fn->node = node;
 
     expect("{");
-    while (!at_eof()) {
-      if (consume("}"))
-        break;
-      vec_add(node->stmts, (void *)stmt());
-    }
+    node->stmts = compound_stmt()->stmts;
   } else {
     if (consume("[")) {
       int array_size = expect_number();
