@@ -218,8 +218,6 @@ void gen(Node *node) {
         gen((Node *)vec_get(node->stmts, i));
       }
       return;
-    case ND_VAR_DECLARE:
-      return;
     case ND_EXPR_STMT:
       gen(node->lhs);
       return;

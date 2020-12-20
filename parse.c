@@ -492,8 +492,7 @@ Node *stmt() {
   return expr_stmt();
 }
 
-Node *declaration(Type *type) {
-  Node *node = new_node(ND_VAR_DECLARE);
+void declaration(Type *type) {
   while (!at_eof()) {
     if (consume("*")) {
       type = pointer_to(type);
@@ -508,10 +507,7 @@ Node *declaration(Type *type) {
     expect("]");
   }
   new_lvar(tok, type);
-  node->name = strndup(tok->str, tok->len);
-  node->type = type;
   expect(";");
-  return node;
 }
 
 // compound-stmt = (declaration | stmt)* "}"
@@ -523,7 +519,7 @@ Node *compound_stmt() {
       break;
     Type *type = detect_type();
     if (type) {
-      vec_add(node->stmts, declaration(type));
+      declaration(type);
     } else {
       vec_add(node->stmts, stmt());
     }
