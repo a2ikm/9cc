@@ -44,5 +44,15 @@ int main() {
   int c = 8;
   ASSERT(8, c);
 
+  int d1;
+  int d2;
+  d1 = d2 = 42;
+  ASSERT(42, d1);
+  ASSERT(42, d2);
+
+  int e1 = 11;
+  int e2 = e1 + 10;
+  ASSERT(21, e2);
+
   return 0;
 }
