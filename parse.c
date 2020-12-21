@@ -436,8 +436,7 @@ Node *expr() {
 
 // expr-stmt = expr? ";"
 Node *expr_stmt() {
-  Node *node = new_node(ND_EXPR_STMT);
-  node->lhs = expr();
+  Node *node = new_unary(ND_EXPR_STMT, expr());
   expect(";");
   return node;
 }
@@ -482,8 +481,7 @@ Node *stmt() {
   } else if (consume("{")) {
     return compound_stmt();
   } else if (consume_kind(TK_RETURN)) {
-    Node *node = new_node(ND_RETURN);
-    node->lhs = expr();
+    Node *node = new_unary(ND_RETURN, expr());
     expect(";");
     return node;
   }
@@ -510,9 +508,9 @@ Node *declaration(Type *type) {
   Var *var = new_lvar(tok, type);
 
   if (consume("=")) {
-    node = new_node(ND_EXPR_STMT);
-    node->lhs = new_binary(ND_ASSIGN, new_var_node(var), assign());
-    node->lhs->type = node->lhs->lhs->type;
+    node = new_binary(ND_ASSIGN, new_var_node(var), assign());
+    node->type = node->lhs->type;
+    node = new_unary(ND_EXPR_STMT, node);
   }
 
   expect(";");
