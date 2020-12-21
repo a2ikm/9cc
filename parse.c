@@ -209,6 +209,13 @@ Node *new_unary(NodeKind kind, Node *expr) {
   return node;
 }
 
+Node *new_var_node(Var *var) {
+  Node *node = new_node(ND_VAR);
+  node->var = var;
+  node->type = var->type;
+  return node;
+}
+
 Node *num() {
   return new_num(expect_number());
 }
@@ -253,18 +260,10 @@ Node *primary() {
       Node *node;
 
       if (var = find_var(tok)) {
-        if (var->is_local) {
-          node = new_node(ND_LVAR);
-          node->offset = var->offset;
-        } else {
-          node = new_node(ND_GVAR);
-        }
+        node = new_var_node(var);
       } else {
         error_at(tok->str, "Unknown variable");
       }
-
-      node->name = strndup(tok->str, tok->len);
-      node->type = var->type;
 
       if (consume("[")) {
         node = new_add(node, expr());

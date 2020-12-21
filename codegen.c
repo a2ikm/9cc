@@ -29,16 +29,17 @@ void pop(char *arg) {
 
 void gen_lval(Node *node) {
   switch(node->kind) {
-    case ND_GVAR:
-      println("  lea rax, %s[rip]", node->name);
-      push("rax");
-      return;
-    case ND_LVAR:
-    case ND_ADDR:
-      println("  mov rax, rbp");
-      println("  sub rax, %d", node->offset);
-      push("rax");
-      return;
+    case ND_VAR:
+      if (node->var->is_local) {
+        println("  mov rax, rbp");
+        println("  sub rax, %d", node->var->offset);
+        push("rax");
+        return;
+      } else {
+        println("  lea rax, %s[rip]", node->var->name);
+        push("rax");
+        return;
+      }
     case ND_DEREF:
       gen(node->lhs);
       return;
@@ -94,8 +95,7 @@ void gen(Node *node) {
       println("  lea rax, %s", node->name);
       push("rax");
       return;
-    case ND_GVAR:
-    case ND_LVAR:
+    case ND_VAR:
       gen_lval(node);
       if (node->type->kind != TYPE_ARRAY)
         load(node->type);

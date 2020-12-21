@@ -103,8 +103,7 @@ typedef enum {
   ND_LT,
   ND_LTEQ,
   ND_ASSIGN,
-  ND_LVAR,
-  ND_GVAR,
+  ND_VAR,
   ND_NUM,
   ND_STRING,
   ND_SIZEOF,
@@ -136,8 +135,8 @@ struct Node {
   Node *increment;
 
   int val;
-  int offset;
   Type *type;
+  Var *var;
 
   char *name;
   Vector *params;
