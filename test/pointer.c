@@ -23,5 +23,9 @@ int main() {
   ASSERT(8, sizeof(ptr2y));
   ASSERT(8, sizeof(ptr2ptr2y));
 
+  int z = 20;
+  int *ptr2z = &z;
+  ASSERT(20, *ptr2z);
+
   return 0;
 }

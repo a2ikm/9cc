@@ -35,5 +35,11 @@ int main() {
   ASSERT(0, s2[3]);
   ASSERT(8, sizeof(s2));
 
+  char *s3 = "baz";
+  ASSERT(98, s3[0]);
+  ASSERT(97, s3[1]);
+  ASSERT(122, s3[2]);
+  ASSERT(0, s2[3]);
+
   return 0;
 }

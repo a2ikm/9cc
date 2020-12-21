@@ -38,5 +38,11 @@ int main() {
   a = g1 + 40;
   ASSERT(70, a);
 
+  int b = 42;
+  ASSERT(42, b);
+
+  int c = 8;
+  ASSERT(8, c);
+
   return 0;
 }

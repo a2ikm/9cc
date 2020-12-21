@@ -491,7 +491,9 @@ Node *stmt() {
   return expr_stmt();
 }
 
-void declaration(Type *type) {
+Node *declaration(Type *type) {
+  Node *node = NULL;
+
   while (!at_eof()) {
     if (consume("*")) {
       type = pointer_to(type);
@@ -505,8 +507,17 @@ void declaration(Type *type) {
     type = array_of(type, array_size);
     expect("]");
   }
-  new_lvar(tok, type);
+  Var *var = new_lvar(tok, type);
+
+  if (consume("=")) {
+    node = new_node(ND_EXPR_STMT);
+    node->lhs = new_binary(ND_ASSIGN, new_var_node(var), assign());
+    node->lhs->type = node->lhs->lhs->type;
+  }
+
   expect(";");
+
+  return node;
 }
 
 // compound-stmt = (declaration | stmt)* "}"
@@ -518,7 +529,9 @@ Node *compound_stmt() {
       break;
     Type *type = detect_type();
     if (type) {
-      declaration(type);
+      Node *init = declaration(type);
+      if (init)
+        vec_add(node->stmts, init);
     } else {
       vec_add(node->stmts, stmt());
     }
