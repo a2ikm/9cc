@@ -491,6 +491,7 @@ Node *stmt() {
 
 Node *declaration(Type *type) {
   Node *node = NULL;
+  Var *var = NULL;
 
   while (!at_eof()) {
     if (consume("*")) {
@@ -504,13 +505,43 @@ Node *declaration(Type *type) {
     int array_size = expect_number();
     type = array_of(type, array_size);
     expect("]");
-  }
-  Var *var = new_lvar(tok, type);
 
-  if (consume("=")) {
-    node = new_binary(ND_ASSIGN, new_var_node(var), assign());
-    node->type = node->lhs->type;
-    node = new_unary(ND_EXPR_STMT, node);
+    var = new_lvar(tok, type);
+
+    if (consume("=")) {
+      expect("{");
+
+      node = new_node(ND_BLOCK);
+      node->stmts = vec_new();
+
+      Node *var_node = new_var_node(var);
+
+      for (int i = 0; i < array_size; i++) {
+        if (i > 0)
+          expect(",");
+
+        Node *init = new_add(var_node, new_num(i));
+        init->type = init->lhs->type;
+        init = new_unary(ND_DEREF, init);
+        init->type = init->lhs->type->base;
+
+        init = new_binary(ND_ASSIGN, init, assign());
+        init->type = init->lhs->type;
+        init = new_unary(ND_EXPR_STMT, init);
+
+        vec_add(node->stmts, init);
+      }
+
+      expect("}");
+    }
+  } else {
+    var = new_lvar(tok, type);
+
+    if (consume("=")) {
+      node = new_binary(ND_ASSIGN, new_var_node(var), assign());
+      node->type = node->lhs->type;
+      node = new_unary(ND_EXPR_STMT, node);
+    }
   }
 
   expect(";");
