@@ -516,9 +516,16 @@ Node *declaration(Type *type) {
 
       Node *var_node = new_var_node(var);
 
-      for (int i = 0; i < array_size; i++) {
-        if (i > 0)
+      int i = 0;
+      bool closed = false;
+      for (; i < array_size; i++) {
+        if (consume("}")) {
+          closed = true;
+          break;
+        }
+        if (i > 0) {
           expect(",");
+        }
 
         Node *init = new_add(var_node, new_num(i));
         init->type = init->lhs->type;
@@ -532,7 +539,22 @@ Node *declaration(Type *type) {
         vec_add(node->stmts, init);
       }
 
-      expect("}");
+      if (!closed) {
+        expect("}");
+      }
+
+      for (; i < array_size; i++) {
+        Node *init = new_add(var_node, new_num(i));
+        init->type = init->lhs->type;
+        init = new_unary(ND_DEREF, init);
+        init->type = init->lhs->type->base;
+
+        init = new_binary(ND_ASSIGN, init, new_num(0));
+        init->type = init->lhs->type;
+        init = new_unary(ND_EXPR_STMT, init);
+
+        vec_add(node->stmts, init);
+      }
     }
   } else {
     var = new_lvar(tok, type);

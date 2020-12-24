@@ -22,5 +22,13 @@ int main() {
   int c[0] = {};
   ASSERT(0, sizeof(c));
 
+  int d[1] = {};
+  ASSERT(0, d[0]);
+
+  int e[3] = { 10 };
+  ASSERT(10, e[0]);
+  ASSERT(0, e[1]);
+  ASSERT(0, e[2]);
+
   return 0;
 }
