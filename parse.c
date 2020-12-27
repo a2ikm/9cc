@@ -489,6 +489,63 @@ Node *stmt() {
   return expr_stmt();
 }
 
+Node *lvar_initializer(Var *var) {
+  Node *node = new_var_node(var);
+
+  if (consume("{")) {
+    Vector *stmts = vec_new();
+
+    int i = 0;
+    bool closed = false;
+    for (; i < var->type->array_size; i++) {
+      if (consume("}")) {
+        closed = true;
+        break;
+      }
+      if (i > 0) {
+        expect(",");
+      }
+
+      Node *init = new_add(node, new_num(i));
+      init->type = init->lhs->type;
+      init = new_unary(ND_DEREF, init);
+      init->type = init->lhs->type->base;
+
+      init = new_binary(ND_ASSIGN, init, assign());
+      init->type = init->lhs->type;
+      init = new_unary(ND_EXPR_STMT, init);
+
+      vec_add(stmts, init);
+    }
+
+    if (!closed) {
+      expect("}");
+    }
+
+    for (; i < var->type->array_size; i++) {
+      Node *init = new_add(node, new_num(i));
+      init->type = init->lhs->type;
+      init = new_unary(ND_DEREF, init);
+      init->type = init->lhs->type->base;
+
+      init = new_binary(ND_ASSIGN, init, new_num(0));
+      init->type = init->lhs->type;
+      init = new_unary(ND_EXPR_STMT, init);
+
+      vec_add(stmts, init);
+    }
+
+    node = new_node(ND_BLOCK);
+    node->stmts = stmts;
+  } else {
+    node = new_binary(ND_ASSIGN, node, assign());
+    node->type = node->lhs->type;
+    node = new_unary(ND_EXPR_STMT, node);
+  }
+
+  return node;
+}
+
 Node *declaration(Type *type) {
   Node *node = NULL;
   Var *var = NULL;
@@ -505,65 +562,11 @@ Node *declaration(Type *type) {
     int array_size = expect_number();
     type = array_of(type, array_size);
     expect("]");
+  }
 
-    var = new_lvar(tok, type);
-
-    if (consume("=")) {
-      expect("{");
-
-      node = new_node(ND_BLOCK);
-      node->stmts = vec_new();
-
-      Node *var_node = new_var_node(var);
-
-      int i = 0;
-      bool closed = false;
-      for (; i < array_size; i++) {
-        if (consume("}")) {
-          closed = true;
-          break;
-        }
-        if (i > 0) {
-          expect(",");
-        }
-
-        Node *init = new_add(var_node, new_num(i));
-        init->type = init->lhs->type;
-        init = new_unary(ND_DEREF, init);
-        init->type = init->lhs->type->base;
-
-        init = new_binary(ND_ASSIGN, init, assign());
-        init->type = init->lhs->type;
-        init = new_unary(ND_EXPR_STMT, init);
-
-        vec_add(node->stmts, init);
-      }
-
-      if (!closed) {
-        expect("}");
-      }
-
-      for (; i < array_size; i++) {
-        Node *init = new_add(var_node, new_num(i));
-        init->type = init->lhs->type;
-        init = new_unary(ND_DEREF, init);
-        init->type = init->lhs->type->base;
-
-        init = new_binary(ND_ASSIGN, init, new_num(0));
-        init->type = init->lhs->type;
-        init = new_unary(ND_EXPR_STMT, init);
-
-        vec_add(node->stmts, init);
-      }
-    }
-  } else {
-    var = new_lvar(tok, type);
-
-    if (consume("=")) {
-      node = new_binary(ND_ASSIGN, new_var_node(var), assign());
-      node->type = node->lhs->type;
-      node = new_unary(ND_EXPR_STMT, node);
-    }
+  var = new_lvar(tok, type);
+  if (consume("=")) {
+    node = lvar_initializer(var);
   }
 
   expect(";");
