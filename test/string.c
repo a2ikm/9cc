@@ -40,6 +40,21 @@ int main() {
   ASSERT(97, s3[1]);
   ASSERT(122, s3[2]);
   ASSERT(0, s2[3]);
+  ASSERT(8, sizeof(s3));
+
+  char s4[4] = { 98, 97, 114, 0 };
+  ASSERT(98, s4[0]);
+  ASSERT(97, s4[1]);
+  ASSERT(114, s4[2]);
+  ASSERT(0, s4[3]);
+  ASSERT(4, sizeof(s4));
+
+  char s5[] = { 98, 97, 114, 0 };
+  ASSERT(98, s5[0]);
+  ASSERT(97, s5[1]);
+  ASSERT(114, s5[2]);
+  ASSERT(0, s5[3]);
+  ASSERT(4, sizeof(s5));
 
   return 0;
 }

@@ -493,11 +493,11 @@ Node *lvar_initializer(Var *var) {
   Node *node = new_var_node(var);
 
   if (consume("{")) {
-    Vector *stmts = vec_new();
+    Vector *exprs = vec_new();
 
     int i = 0;
     bool closed = false;
-    for (; i < var->type->array_size; i++) {
+    while(!at_eof()) {
       if (consume("}")) {
         closed = true;
         break;
@@ -506,29 +506,32 @@ Node *lvar_initializer(Var *var) {
         expect(",");
       }
 
-      Node *init = new_add(node, new_num(i));
-      init->type = init->lhs->type;
-      init = new_unary(ND_DEREF, init);
-      init->type = init->lhs->type->base;
-
-      init = new_binary(ND_ASSIGN, init, assign());
-      init->type = init->lhs->type;
-      init = new_unary(ND_EXPR_STMT, init);
-
-      vec_add(stmts, init);
+      vec_add(exprs, assign());
+      i++;
     }
 
     if (!closed) {
       expect("}");
     }
 
-    for (; i < var->type->array_size; i++) {
-      Node *init = new_add(node, new_num(i));
+    if (var->type->array_size == -1) {
+      var->type = array_of(var->type->base, vec_len(exprs));
+    } else if (var->type->array_size < vec_len(exprs)) {
+      error_at(token->str, "Too many initializers");
+    } else {
+      for (; vec_len(exprs) < var->type->array_size;) {
+        vec_add(exprs, new_num(0));
+      }
+    }
+
+    Vector *stmts = vec_new();
+    for (int j = 0; j < vec_len(exprs); j++) {
+      Node *init = new_add(node, new_num(j));
       init->type = init->lhs->type;
       init = new_unary(ND_DEREF, init);
       init->type = init->lhs->type->base;
 
-      init = new_binary(ND_ASSIGN, init, new_num(0));
+      init = new_binary(ND_ASSIGN, init, vec_get(exprs, j));
       init->type = init->lhs->type;
       init = new_unary(ND_EXPR_STMT, init);
 
@@ -559,8 +562,11 @@ Node *declaration(Type *type) {
   }
   Token *tok = expect_kind(TK_IDENT);
   if (consume("[")) {
-    int array_size = expect_number();
-    type = array_of(type, array_size);
+    if (token->kind == TK_NUM) {
+      type = array_of(type, expect_number());
+    } else {
+      type = array_of(type, -1);
+    }
     expect("]");
   }
 
