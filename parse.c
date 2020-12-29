@@ -4,7 +4,7 @@ Type *int_type = &(Type){ TYPE_INT, DWORD_SIZE, NULL };
 Type *char_type = &(Type){ TYPE_CHAR, BYTE_SIZE, NULL };
 
 typedef struct Env {
-  Vector *vars;
+  Map *vars;
   struct Env *prev;
 } Env;
 
@@ -13,7 +13,7 @@ Vector *lvars;
 
 Env *new_env(Env *prev) {
   Env *env = calloc(1, sizeof(Env));
-  env->vars = vec_new();
+  env->vars = map_new();
   env->prev = prev;
   return env;
 }
@@ -47,10 +47,9 @@ Var *new_var(Token *tok, Type *type) {
 
 Var *find_var(Token *tok) {
   for (Env *e = env; e; e = e->prev) {
-    for (int i = 0; i < vec_len(e->vars); i++) {
-      Var *var = vec_get(e->vars, i);
-      if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
-        return var;
+    Var *var = map_get2(e->vars, tok->str, tok->len);
+    if (var) {
+      return var;
     }
   }
   return NULL;
@@ -66,7 +65,7 @@ Var *new_lvar(Token *tok, Type *type) {
   else
     lvar->offset = lvar->type->size;
 
-  vec_add(env->vars, lvar);
+  map_put2(env->vars, tok->str, tok->len, lvar);
   vec_add(lvars, lvar);
   return lvar;
 }
@@ -75,7 +74,7 @@ Var *new_gvar(Token *tok, Type *type) {
   Var *gvar = new_var(tok, type);
   gvar->is_local = false;
 
-  vec_add(env->vars, gvar);
+  map_put2(env->vars, tok->str, tok->len, gvar);
   vec_add(gvars, gvar);
   return gvar;
 }
