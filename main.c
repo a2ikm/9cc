@@ -45,6 +45,8 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  map_test();
+
   funcs = vec_new();
   gvars = vec_new();
   strings = vec_new();

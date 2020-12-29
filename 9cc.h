@@ -1,10 +1,12 @@
 #ifndef __9CC_H__
 #define __9CC_H__
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +27,28 @@ void vec_add(Vector *vec, void *item);
 int vec_len(Vector *vec);
 void *vec_get(Vector *vec, int idx);
 void *vec_last(Vector *vec);
+
+// map.c
+typedef struct {
+  char *key;
+  int keylen;
+  void *data;
+} MapEntry;
+
+typedef struct {
+  MapEntry *buckets;
+  int size;
+  int len;
+} Map;
+
+Map *map_new();
+void *map_get(Map *map, char *key);
+void *map_get2(Map *map, char *key, int keylen);
+void map_put(Map *map, char *key, void *data);
+void map_put2(Map *map, char *key, int keylen, void *data);
+void map_delete(Map *map, char *key);
+void map_delete2(Map *map, char *key, int keylen);
+void map_test();
 
 // helper.c
 char *strndup(const char *s, size_t n);
@@ -169,5 +193,7 @@ void parse();
 void emit_bss();
 void emit_data();
 void emit_text();
+
+#define unreachable() error("unreachable %s:%d", __FILE__, __LINE__)
 
 #endif
