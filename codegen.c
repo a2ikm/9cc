@@ -92,7 +92,7 @@ void gen(Node *node) {
       push("rax");
       return;
     case ND_STRING:
-      println("  lea rax, %s", node->name);
+      println("  lea rax, %s", node->string->name);
       push("rax");
       return;
     case ND_VAR:
@@ -298,10 +298,16 @@ void emit_bss() {
 }
 
 void emit_data() {
-  if (vec_len(strings) == 0) return;
+  Vector *keys = map_keys(strings);
 
-  for (int i = 0; i < vec_len(strings); i++) {
-    String *string = vec_get(strings, i);
+  for (int i = 0; i < vec_len(keys); i++) {
+    char *key = vec_get(keys, i);
+    String *string = map_get(strings, key);
+
+    int len = snprintf(NULL, 0, ".LC%d", i);
+    string->name = (char *)malloc(sizeof(char) * (len + 1));
+    sprintf(string->name, ".LC%d", i);
+
     println("  .data");
     println("%s:", string->name);
     println("  .string \"%s\"", string->string);

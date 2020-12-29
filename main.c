@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
   funcs = vec_new();
   gvars = vec_new();
-  strings = vec_new();
+  strings = map_new();
 
   filename = argv[1];
   user_input = read_file(filename);

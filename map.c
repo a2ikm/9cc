@@ -139,11 +139,25 @@ void map_delete2(Map *map, char *key, int keylen) {
   }
 }
 
+Vector *map_keys(Map *map) {
+  Vector *keys = vec_new();
+
+  for (int i = 0; i < map->size; i++) {
+    MapEntry *entry = &map->buckets[i];
+    if (entry && entry->key && entry->key != TOMBSTONE) {
+      vec_add(keys, strndup(entry->key, entry->keylen));
+    }
+  }
+
+  return keys;
+}
+
 void map_test() {
   Map *map = map_new();
 
   for (int i = 0; i < INITIAL_SIZE + 1; i++) {
     int *ret;
+    Vector *keys;
 
     int len = snprintf(NULL, 0, "key%d", i);
     char *key = malloc(sizeof(char) * len);
@@ -154,12 +168,24 @@ void map_test() {
     ret = (int *)map_get(map, key);
     assert(ret == NULL);
 
+    keys = map_keys(map);
+    assert(vec_len(keys) == 0);
+
     map_put(map, key, obj);
+
     ret = (int *)map_get(map, key);
     assert(ret == obj);
 
+    keys = map_keys(map);
+    assert(vec_len(keys) == 1);
+    assert(memcmp(vec_get(keys, 0), key, len) == 0);
+
     map_delete(map, key);
+
     ret = (int *)map_get(map, key);
     assert(ret == NULL);
+
+    keys = map_keys(map);
+    assert(vec_len(keys) == 0);
   }
 }

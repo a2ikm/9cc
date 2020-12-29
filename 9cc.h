@@ -48,6 +48,7 @@ void map_put(Map *map, char *key, void *data);
 void map_put2(Map *map, char *key, int keylen, void *data);
 void map_delete(Map *map, char *key);
 void map_delete2(Map *map, char *key, int keylen);
+Vector *map_keys(Map *map);
 void map_test();
 
 // helper.c
@@ -162,6 +163,7 @@ struct Node {
   int val;
   Type *type;
   Var *var;
+  String *string;
 
   char *name;
   Vector *params;
@@ -177,7 +179,7 @@ typedef struct {
 
 Vector *funcs;
 Vector *gvars;
-Vector *strings;
+Map *strings;
 
 Token *token;
 char *user_input;

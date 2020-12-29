@@ -80,15 +80,15 @@ Var *new_gvar(Token *tok, Type *type) {
 }
 
 String *new_string(Token *tok) {
-  String *string = calloc(1, sizeof(String));
+  String *string = map_get2(strings, tok->str, tok->len);
+  if (string) {
+    return string;
+  }
+
+  string = calloc(1, sizeof(String));
   string->string = strndup(tok->str, tok->len);
 
-
-  int len = snprintf(NULL, 0, ".LC%d", vec_len(strings));
-  string->name = (char *)malloc(sizeof(char) * (len + 1));
-  sprintf(string->name, ".LC%d", vec_len(strings));
-
-  vec_add(strings, string);
+  map_put2(strings, tok->str, tok->len, string);
   return string;
 }
 
@@ -280,7 +280,7 @@ Node *primary() {
   if (tok = consume_kind(TK_STRING)) {
     String *string = new_string(tok);
     Node *node = new_node(ND_STRING);
-    node->name = string->name;
+    node->string = string;
     node->type = pointer_to(char_type);
     return node;
   }
