@@ -13,11 +13,7 @@
 #define DWORD_SIZE 4
 #define BYTE_SIZE 1
 
-// helper.c
-char *strndup(const char *s, size_t n);
-void error(char *fmt, ...);
-void error_at(char *loc, char *fmt, ...);
-
+// vector.c
 typedef struct {
   void **data;
   int len;
@@ -29,6 +25,11 @@ void vec_add(Vector *vec, void *item);
 int vec_len(Vector *vec);
 void *vec_get(Vector *vec, int idx);
 void *vec_last(Vector *vec);
+
+// helper.c
+char *strndup(const char *s, size_t n);
+void error(char *fmt, ...);
+void error_at(char *loc, char *fmt, ...);
 
 typedef enum {
   TK_RESERVED,  // 記号
