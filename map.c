@@ -39,7 +39,7 @@ static void rehash(Map *map) {
 
   for (int i = 0; i < map->size; i++) {
     MapEntry *entry = &map->buckets[i];
-    if (entry && entry->key != TOMBSTONE) {
+    if (entry && entry->key && entry->key != TOMBSTONE) {
       map_put2(map2, entry->key, entry->keylen, entry->data);
     }
   }
