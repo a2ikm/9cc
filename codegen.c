@@ -1,6 +1,7 @@
 #include "9cc.h"
 
 char *regsb[] = { "dil", "sil", "dl",  "cl",  "r8b", "r9b" };
+char *regsw[] = { "di",  "si",  "dx",  "cx",  "r8w", "r9w" };
 char *regsd[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
 char *regsq[] = { "rdi", "rsi", "rdx", "rcx", "r8",  "r9" };
 
@@ -55,6 +56,9 @@ void load(Type *type) {
     case DWORD_SIZE:
       println("  movsxd rax, dword ptr [rax]");
       break;
+    case WORD_SIZE:
+      println("  movsx rax, word ptr [rax]");
+      break;
     case BYTE_SIZE:
       println("  movsx rax, byte ptr [rax]");
       break;
@@ -72,6 +76,9 @@ void store(Type *type) {
   switch (type->size) {
     case DWORD_SIZE:
       println("  mov [rax], edi");
+      break;
+    case WORD_SIZE:
+      println("  mov [rax], di");
       break;
     case BYTE_SIZE:
       println("  mov [rax], dil");
@@ -204,6 +211,9 @@ void gen(Node *node) {
         Var *lvar = vec_get(node->params, i);
         switch (lvar->type->size) {
           case DWORD_SIZE:
+            println("  mov [rbp-%d], %s", lvar->offset, regsd[i]);
+            break;
+          case WORD_SIZE:
             println("  mov [rbp-%d], %s", lvar->offset, regsd[i]);
             break;
           case BYTE_SIZE:

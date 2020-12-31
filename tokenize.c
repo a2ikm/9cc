@@ -176,6 +176,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "short")) {
+      cur = new_token(TK_SHORT, cur, p, 5);
+      p += 5;
+      continue;
+    }
+
     if (match(p, "char")) {
       cur = new_token(TK_CHAR, cur, p, 4);
       p += 4;

@@ -1,7 +1,8 @@
 #include "9cc.h"
 
-Type *int_type = &(Type){ TYPE_INT, DWORD_SIZE, NULL };
-Type *char_type = &(Type){ TYPE_CHAR, BYTE_SIZE, NULL };
+Type *int_type   = &(Type){ TYPE_INT,   DWORD_SIZE, NULL };
+Type *short_type = &(Type){ TYPE_SHORT, WORD_SIZE,  NULL };
+Type *char_type  = &(Type){ TYPE_CHAR,  BYTE_SIZE,  NULL };
 
 typedef struct Env {
   Map *vars;
@@ -19,7 +20,7 @@ Env *new_env(Env *prev) {
 }
 
 bool is_integer(Type *type) {
-  return type->kind == TYPE_INT || type->kind == TYPE_CHAR;
+  return type->kind == TYPE_INT || type->kind == TYPE_SHORT || type->kind == TYPE_CHAR;
 }
 
 void dump_type(Node *node) {
@@ -171,6 +172,8 @@ Token *expect_kind(TokenKind kind) {
 Type *detect_type() {
   if (consume_kind(TK_INT))
     return int_type;
+  else if (consume_kind(TK_SHORT))
+    return short_type;
   else if (consume_kind(TK_CHAR))
     return char_type;
   else

@@ -13,6 +13,7 @@
 
 #define QWORD_SIZE 8
 #define DWORD_SIZE 4
+#define WORD_SIZE 2
 #define BYTE_SIZE 1
 
 // vector.c
@@ -64,6 +65,7 @@ typedef enum {
   TK_WHILE,     // "while"
   TK_FOR,       // "for"
   TK_INT,       // "int"
+  TK_SHORT,     // "short"
   TK_CHAR,      // "char"
   TK_SIZEOF,    // "sizeof"
   TK_IDENT,     // 識別子
@@ -85,6 +87,7 @@ struct Token {
 typedef enum {
   TYPE_PTR,
   TYPE_INT,
+  TYPE_SHORT,
   TYPE_CHAR,
   TYPE_ARRAY,
 } TypeKind;
@@ -99,6 +102,7 @@ struct Type {
 };
 
 extern Type *int_type;
+extern Type *short_type;
 extern Type *char_type;
 
 typedef struct Var {
