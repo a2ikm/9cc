@@ -140,7 +140,9 @@ Token *expect_kind(TokenKind kind) {
 }
 
 Type *detect_type() {
-  if (consume_kind(TK_INT))
+  if (consume_kind(TK_LONG))
+    return long_type;
+  else if (consume_kind(TK_INT))
     return int_type;
   else if (consume_kind(TK_SHORT))
     return short_type;

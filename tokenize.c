@@ -170,6 +170,12 @@ void tokenize() {
       continue;
     }
 
+    if (match(p, "long")) {
+      cur = new_token(TK_LONG, cur, p, 4);
+      p += 4;
+      continue;
+    }
+
     if (match(p, "int")) {
       cur = new_token(TK_INT, cur, p, 3);
       p += 3;

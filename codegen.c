@@ -62,6 +62,7 @@ void load(Type *type) {
     case BYTE_SIZE:
       println("  movsx rax, byte ptr [rax]");
       break;
+    case QWORD_SIZE:
     default:
       println("  mov rax, [rax]");
   }
@@ -83,6 +84,7 @@ void store(Type *type) {
     case BYTE_SIZE:
       println("  mov [rax], dil");
       break;
+    case QWORD_SIZE:
     default:
       println("  mov [rax], rdi");
   }
@@ -219,6 +221,7 @@ void gen(Node *node) {
           case BYTE_SIZE:
             println("  mov [rbp-%d], %s", lvar->offset, regsb[i]);
             break;
+          case QWORD_SIZE:
           default:
             println("  mov [rbp-%d], %s", lvar->offset, regsq[i]);
         }

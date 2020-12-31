@@ -1,5 +1,6 @@
 #include "9cc.h"
 
+Type *long_type  = &(Type){ TYPE_LONG,  QWORD_SIZE, NULL };
 Type *int_type   = &(Type){ TYPE_INT,   DWORD_SIZE, NULL };
 Type *short_type = &(Type){ TYPE_SHORT, WORD_SIZE,  NULL };
 Type *char_type  = &(Type){ TYPE_CHAR,  BYTE_SIZE,  NULL };
@@ -27,7 +28,8 @@ Type *array_of(Type *base, size_t array_size) {
 }
 
 bool is_integer(Type *type) {
-  return type->kind == TYPE_INT || type->kind == TYPE_SHORT || type->kind == TYPE_CHAR;
+  TypeKind kind = type->kind;
+  return kind == TYPE_LONG || kind == TYPE_INT || kind == TYPE_SHORT || kind == TYPE_CHAR;
 }
 
 Type *max_type_by_size(Type *ltype, Type *rtype) {

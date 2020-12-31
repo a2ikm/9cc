@@ -64,6 +64,7 @@ typedef enum {
   TK_ELSE,      // "else"
   TK_WHILE,     // "while"
   TK_FOR,       // "for"
+  TK_LONG,      // "long"
   TK_INT,       // "int"
   TK_SHORT,     // "short"
   TK_CHAR,      // "char"
@@ -88,6 +89,7 @@ struct Token {
 
 typedef enum {
   TYPE_PTR,
+  TYPE_LONG,
   TYPE_INT,
   TYPE_SHORT,
   TYPE_CHAR,
@@ -103,6 +105,7 @@ struct Type {
   size_t array_size;
 };
 
+extern Type *long_type;
 extern Type *int_type;
 extern Type *short_type;
 extern Type *char_type;
