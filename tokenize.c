@@ -126,6 +126,20 @@ void tokenize() {
       continue;
     }
 
+    if (*p == '\'') {
+      char *start = ++p;
+
+      p++;
+      if (*p != '\'')
+        error_at(start, "single quotation not found");
+
+      cur = new_token(TK_NUM, cur, start, 1);
+      cur->val = *start;
+
+      p++;
+      continue;
+    }
+
     if (match(p, "return")) {
       cur = new_token(TK_RETURN, cur, p, 6);
       p += 6;

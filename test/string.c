@@ -18,6 +18,10 @@ int main() {
   c3 = 20;
   ASSERT(30, add(c2, c3));
 
+  char c4 = 'a';
+  ASSERT(97, c4);
+  ASSERT('c', c4 + 2);
+
   char s1[10];
   s1[0] = 10;
   s1[1] = 20;
