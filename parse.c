@@ -169,6 +169,10 @@ Token *expect_kind(TokenKind kind) {
   return tok;
 }
 
+Type *max_type_by_size(Type *ltype, Type *rtype) {
+  return ltype->size > rtype->size ? ltype : rtype;
+}
+
 Type *detect_type() {
   if (consume_kind(TK_INT))
     return int_type;
@@ -323,7 +327,7 @@ Node *mul() {
   for (;;) {
     if (consume("*")) {
       node = new_binary(ND_MUL, node, unary());
-      node->type = node->lhs->type;
+      node->type = max_type_by_size(node->lhs->type, node->rhs->type);
     } else if (consume("/")) {
       node = new_binary(ND_DIV, node, unary());
       node->type = node->lhs->type;
@@ -338,7 +342,7 @@ Node *new_add(Node *lhs, Node *rhs) {
 
   if (is_integer(lhs->type) && is_integer(rhs->type)) {
     node = new_binary(ND_ADD, lhs, rhs);
-    node->type = int_type;
+    node->type = max_type_by_size(lhs->type, rhs->type);
   } else if (is_integer(lhs->type)) {
     node = new_binary(ND_PTR_ADD, rhs, lhs);
     node->type = rhs->type;
@@ -357,7 +361,7 @@ Node *new_sub(Node *lhs, Node *rhs) {
 
   if (is_integer(lhs->type) && is_integer(rhs->type)) {
     node = new_binary(ND_SUB, lhs, rhs);
-    node->type = int_type;
+    node->type = max_type_by_size(lhs->type, rhs->type);
   } else if (is_integer(rhs->type)) {
     node = new_binary(ND_PTR_SUB, lhs, rhs);
     node->type = lhs->type;

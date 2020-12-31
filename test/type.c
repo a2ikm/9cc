@@ -13,5 +13,23 @@ int main() {
   ASSERT(42, char42);
   ASSERT(1, sizeof(char42));
 
+  ASSERT(sizeof(int42), sizeof(int42 + short42));
+  ASSERT(sizeof(int42), sizeof(short42 + int42));
+
+  ASSERT(sizeof(int42), sizeof(int42 * short42));
+  ASSERT(sizeof(int42), sizeof(short42 * int42));
+
+  ASSERT(sizeof(int42), sizeof(int42 - short42));
+  ASSERT(sizeof(int42), sizeof(short42 - int42));
+
+  ASSERT(sizeof(short42), sizeof(short42 + char42));
+  ASSERT(sizeof(short42), sizeof(char42 + short42));
+
+  ASSERT(sizeof(short42), sizeof(short42 * char42));
+  ASSERT(sizeof(short42), sizeof(char42 * short42));
+
+  ASSERT(sizeof(short42), sizeof(short42 - char42));
+  ASSERT(sizeof(short42), sizeof(char42 - short42));
+
   return 0;
 }
