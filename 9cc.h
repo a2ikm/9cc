@@ -84,6 +84,8 @@ struct Token {
   int len;
 };
 
+// type.c
+
 typedef enum {
   TYPE_PTR,
   TYPE_INT,
@@ -104,6 +106,12 @@ struct Type {
 extern Type *int_type;
 extern Type *short_type;
 extern Type *char_type;
+
+Type *new_type(TypeKind kind);
+Type *pointer_to(Type *base);
+Type *array_of(Type *base, size_t array_size);
+bool is_integer(Type *type);
+Type *max_type_by_size(Type *ltype, Type *rtype);
 
 typedef struct Var {
   char *name;
