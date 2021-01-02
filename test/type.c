@@ -1,6 +1,11 @@
 #include "test.h"
 
 int main() {
+  ASSERT(8, sizeof(long));
+  ASSERT(4, sizeof(int));
+  ASSERT(2, sizeof(short));
+  ASSERT(1, sizeof(char));
+
   long long42 = 42;
   ASSERT(42, long42);
   ASSERT(8, sizeof(long42));

@@ -79,8 +79,8 @@ Function *find_func(Token *tok) {
   return NULL;
 }
 
-bool equal(char *op) {
-  return strlen(op) == token->len && memcmp(token->str, op, token->len) == 0;
+bool equal(Token *tok, char *op) {
+  return strlen(op) == tok->len && memcmp(tok->str, op, tok->len) == 0;
 }
 
 Token *advance() {
@@ -90,7 +90,7 @@ Token *advance() {
 }
 
 Token *consume(char *op) {
-  if (equal(op))
+  if (equal(token, op))
     return advance();
 
   return NULL;
@@ -104,7 +104,7 @@ Token *consume_kind(TokenKind kind) {
 }
 
 void expect(char *op) {
-  if (equal(op))
+  if (equal(token, op))
     advance();
   else
     error_at(token->str, "'%s'ではありません", op);
@@ -124,6 +124,13 @@ Token *expect_kind(TokenKind kind) {
 
   error_at(token->str, "kindが異なります");
   unreachable();
+}
+
+bool is_type_name(Token *tok) {
+  return equal(tok, "long") ||
+    (equal(tok, "int")) ||
+    (equal(tok, "short")) ||
+    (equal(tok, "char"));
 }
 
 Type *detect_type() {
@@ -254,6 +261,7 @@ Node *primary() {
 //       | "-" primary
 //       | "*" unary
 //       | "&" unary
+//       | "sizeof" "(" type-name ")"
 //       | "sizeof" unary
 //       | primary
 Node *unary() {
@@ -275,7 +283,14 @@ Node *unary() {
     return node;
   }
   if (consume("sizeof")) {
-    return new_num(unary()->type->size);
+    if (equal(token, "(") && is_type_name(token->next)) {
+      consume("(");
+      Node *node = new_num(detect_type()->size);
+      expect(")");
+      return node;
+    } else {
+      return new_num(unary()->type->size);
+    }
   }
   return primary();
 }
