@@ -95,10 +95,6 @@ Token *consume_kind(TokenKind kind) {
   return tok;
 }
 
-Token *consume_ident() {
-  return consume_kind(TK_IDENT);
-}
-
 void expect(char *op) {
   if (token->kind != TK_PUNC ||
       strlen(op) != token->len ||
@@ -191,7 +187,7 @@ Node *primary() {
 
   Token *tok = NULL;
 
-  if (tok = consume_ident()) {
+  if (tok = consume_kind(TK_IDENT)) {
     if (consume("(")) {
       Function *fn = find_func(tok);
       if (!fn) {
