@@ -263,6 +263,12 @@ Node *primary() {
   return num();
 }
 
+// unary = "+" primary
+//       | "-" primary
+//       | "*" unary
+//       | "&" unary
+//       | "sizeof" unary
+//       | primary
 Node *unary() {
   if (consume("+"))
     return primary();
@@ -394,6 +400,7 @@ Node *equality() {
   }
 }
 
+// assign = equality ("=" assign)?
 Node *assign() {
   Node *node = equality();
   if (consume("=")) {
