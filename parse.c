@@ -15,21 +15,6 @@ Env *new_env(Env *prev) {
   return env;
 }
 
-void dump_type(Node *node) {
-  Type *type = node->type;
-  fprintf(stderr, "%s: ", node->name);
-  for (;type;) {
-    if (type->kind == TYPE_PTR) {
-      fprintf(stderr, "ptr->");
-      type = type->base;
-    } else if (type->kind == TYPE_INT) {
-      fprintf(stderr, "int\n");
-      return;
-    }
-  }
-  fprintf(stderr, "null\n");
-}
-
 Var *new_var(Token *tok, Type *type) {
   Var *var = calloc(1, sizeof(Var));
   var->name = strndup(tok->str, tok->len);
