@@ -141,61 +141,61 @@ void tokenize() {
     }
 
     if (match(p, "return")) {
-      cur = new_token(TK_RETURN, cur, p, 6);
+      cur = new_token(TK_KW, cur, p, 6);
       p += 6;
       continue;
     }
 
     if (match(p, "if")) {
-      cur = new_token(TK_IF, cur, p, 2);
+      cur = new_token(TK_KW, cur, p, 2);
       p += 2;
       continue;
     }
 
     if (match(p, "else")) {
-      cur = new_token(TK_ELSE, cur, p, 4);
+      cur = new_token(TK_KW, cur, p, 4);
       p += 4;
       continue;
     }
 
     if (match(p, "while")) {
-      cur = new_token(TK_WHILE, cur, p, 5);
+      cur = new_token(TK_KW, cur, p, 5);
       p += 5;
       continue;
     }
 
     if (match(p, "for")) {
-      cur = new_token(TK_FOR, cur, p, 3);
+      cur = new_token(TK_KW, cur, p, 3);
       p += 3;
       continue;
     }
 
     if (match(p, "long")) {
-      cur = new_token(TK_LONG, cur, p, 4);
+      cur = new_token(TK_KW, cur, p, 4);
       p += 4;
       continue;
     }
 
     if (match(p, "int")) {
-      cur = new_token(TK_INT, cur, p, 3);
+      cur = new_token(TK_KW, cur, p, 3);
       p += 3;
       continue;
     }
 
     if (match(p, "short")) {
-      cur = new_token(TK_SHORT, cur, p, 5);
+      cur = new_token(TK_KW, cur, p, 5);
       p += 5;
       continue;
     }
 
     if (match(p, "char")) {
-      cur = new_token(TK_CHAR, cur, p, 4);
+      cur = new_token(TK_KW, cur, p, 4);
       p += 4;
       continue;
     }
 
     if (match(p, "sizeof")) {
-      cur = new_token(TK_SIZEOF, cur, p, 6);
+      cur = new_token(TK_KW, cur, p, 6);
       p += 6;
       continue;
     }

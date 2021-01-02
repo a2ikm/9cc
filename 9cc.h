@@ -59,16 +59,7 @@ void error_at(char *loc, char *fmt, ...);
 
 typedef enum {
   TK_PUNC,      // 記号
-  TK_RETURN,    // "return"
-  TK_IF,        // "if"
-  TK_ELSE,      // "else"
-  TK_WHILE,     // "while"
-  TK_FOR,       // "for"
-  TK_LONG,      // "long"
-  TK_INT,       // "int"
-  TK_SHORT,     // "short"
-  TK_CHAR,      // "char"
-  TK_SIZEOF,    // "sizeof"
+  TK_KW,        // 予約語
   TK_IDENT,     // 識別子
   TK_NUM,       // 整数
   TK_STRING,    // 文字列

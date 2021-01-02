@@ -80,8 +80,7 @@ Function *find_func(Token *tok) {
 }
 
 bool consume(char *op) {
-  if (token->kind != TK_PUNC ||
-      strlen(op) != token->len ||
+  if (strlen(op) != token->len ||
       memcmp(token->str, op, token->len))
     return false;
   token = token->next;
@@ -125,13 +124,13 @@ Token *expect_kind(TokenKind kind) {
 }
 
 Type *detect_type() {
-  if (consume_kind(TK_LONG))
+  if (consume("long"))
     return long_type;
-  else if (consume_kind(TK_INT))
+  else if (consume("int"))
     return int_type;
-  else if (consume_kind(TK_SHORT))
+  else if (consume("short"))
     return short_type;
-  else if (consume_kind(TK_CHAR))
+  else if (consume("char"))
     return char_type;
   else
     return NULL;
@@ -272,7 +271,7 @@ Node *unary() {
     node->type = pointer_to(node->lhs->type);
     return node;
   }
-  if (consume_kind(TK_SIZEOF)) {
+  if (consume("sizeof")) {
     Node *node = new_unary(ND_SIZEOF, unary());
     node->type = int_type;
     return node;
@@ -417,23 +416,23 @@ Node *stmt() {
   Node *node;
 
   // end with stmt
-  if (consume_kind(TK_IF)) {
+  if (consume("if")) {
     Node *node = new_node(ND_IF);
     expect("(");
     node->condition = expr();
     expect(")");
     node->consequence = stmt();
-    if (consume_kind(TK_ELSE))
+    if (consume("else"))
       node->alternative = stmt();
     return node;
-  } else if (consume_kind(TK_WHILE)) {
+  } else if (consume("while")) {
     Node *node = new_node(ND_WHILE);
     expect("(");
     node->condition = expr();
     expect(")");
     node->consequence = stmt();
     return node;
-  } else if (consume_kind(TK_FOR)) {
+  } else if (consume("for")) {
     Node *node = new_node(ND_FOR);
     expect("(");
     node->initialization = expr();
@@ -446,7 +445,7 @@ Node *stmt() {
     return node;
   } else if (consume("{")) {
     return compound_stmt();
-  } else if (consume_kind(TK_RETURN)) {
+  } else if (consume("return")) {
     Node *node = new_unary(ND_RETURN, expr());
     expect(";");
     return node;
