@@ -80,7 +80,7 @@ Function *find_func(Token *tok) {
 }
 
 bool consume(char *op) {
-  if (token->kind != TK_RESERVED ||
+  if (token->kind != TK_PUNC ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len))
     return false;
@@ -101,7 +101,7 @@ Token *consume_ident() {
 }
 
 void expect(char *op) {
-  if (token->kind != TK_RESERVED ||
+  if (token->kind != TK_PUNC ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len))
     error_at(token->str, "'%s'ではありません", op);

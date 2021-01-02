@@ -58,7 +58,7 @@ void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 
 typedef enum {
-  TK_RESERVED,  // 記号
+  TK_PUNC,      // 記号
   TK_RETURN,    // "return"
   TK_IF,        // "if"
   TK_ELSE,      // "else"
