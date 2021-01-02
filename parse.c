@@ -79,44 +79,51 @@ Function *find_func(Token *tok) {
   return NULL;
 }
 
-bool consume(char *op) {
-  if (strlen(op) != token->len ||
-      memcmp(token->str, op, token->len))
-    return false;
+bool equal(char *op) {
+  return strlen(op) == token->len && memcmp(token->str, op, token->len) == 0;
+}
+
+Token *advance() {
+  Token *tok = token;
   token = token->next;
-  return true;
+  return tok;
+}
+
+Token *consume(char *op) {
+  if (equal(op))
+    return advance();
+
+  return NULL;
 }
 
 Token *consume_kind(TokenKind kind) {
-  if (token->kind != kind)
-    return NULL;
-  Token *tok = token;
-  token = token->next;
-  return tok;
+  if (token->kind == kind)
+    return advance();
+
+  return NULL;
 }
 
 void expect(char *op) {
-  if (token->kind != TK_PUNC ||
-      strlen(op) != token->len ||
-      memcmp(token->str, op, token->len))
+  if (equal(op))
+    advance();
+  else
     error_at(token->str, "'%s'ではありません", op);
-  token = token->next;
 }
 
 int expect_number() {
-  if (token->kind != TK_NUM)
-    error_at(token->str, "数ではありません");
-  int val = token->val;
-  token = token->next;
-  return val;
+  if (token->kind == TK_NUM)
+    return advance()->val;
+
+  error_at(token->str, "数ではありません");
+  unreachable();
 }
 
 Token *expect_kind(TokenKind kind) {
-  if (token->kind != kind)
-    error_at(token->str, "kindが異なります");
-  Token *tok = token;
-  token = token->next;
-  return tok;
+  if (token->kind == kind)
+    return advance();
+
+  error_at(token->str, "kindが異なります");
+  unreachable();
 }
 
 Type *detect_type() {
