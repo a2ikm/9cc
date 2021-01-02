@@ -110,7 +110,7 @@ void expect(char *op) {
     error_at(token->str, "'%s'ではありません", op);
 }
 
-int expect_number() {
+int expect_num() {
   if (token->kind == TK_NUM)
     return advance()->val;
 
@@ -178,7 +178,7 @@ Node *new_var_node(Var *var) {
 }
 
 Node *num() {
-  return new_num(expect_number());
+  return new_num(expect_num());
 }
 
 Node *expr();
@@ -531,7 +531,7 @@ Node *declaration(Type *type) {
   Token *tok = expect_kind(TK_IDENT);
   if (consume("[")) {
     if (token->kind == TK_NUM) {
-      type = array_of(type, expect_number());
+      type = array_of(type, expect_num());
     } else {
       type = array_of(type, -1);
     }
@@ -631,7 +631,7 @@ void func() {
     node->stmts = compound_stmt()->stmts;
   } else {
     if (consume("[")) {
-      int array_size = expect_number();
+      int array_size = expect_num();
       type = array_of(type, array_size);
       expect("]");
     }
