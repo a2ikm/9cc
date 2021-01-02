@@ -122,10 +122,6 @@ void gen(Node *node) {
       gen(node->rhs);
       store(node->type);
       return;
-    case ND_SIZEOF:
-      println("  mov rax, %ld", node->lhs->type->size);
-      push("rax");
-      return;
     case ND_RETURN:
       gen(node->lhs);
       pop("rax");

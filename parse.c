@@ -275,9 +275,7 @@ Node *unary() {
     return node;
   }
   if (consume("sizeof")) {
-    Node *node = new_unary(ND_SIZEOF, unary());
-    node->type = int_type;
-    return node;
+    return new_num(unary()->type->size);
   }
   return primary();
 }

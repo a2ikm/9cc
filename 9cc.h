@@ -138,7 +138,6 @@ typedef enum {
   ND_VAR,
   ND_NUM,
   ND_STRING,
-  ND_SIZEOF,
   ND_RETURN,
   ND_IF,
   ND_WHILE,
