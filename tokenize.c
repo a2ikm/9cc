@@ -25,9 +25,21 @@ bool is_alnum(char c) {
   return isalpha(c) || isdigit(c) || c == '_';
 }
 
-bool match(char *p, char *kwd) {
-  int len = strlen(kwd);
-  return (!strncmp(p, kwd, len) && !is_alnum(p[len]));
+bool is_keyword(Token *tok) {
+  static Map *map = NULL;
+
+  if (!map) {
+    map = map_new();
+    char *kw[] = {
+      "return", "if", "else", "while", "for", "sizeof",
+      "long", "int", "short", "char",
+    };
+    for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++) {
+      map_put(map, kw[i], (void *)1);
+    }
+  }
+
+  return map_get2(map, tok->str, tok->len);
 }
 
 void tokenize() {
@@ -140,70 +152,14 @@ void tokenize() {
       continue;
     }
 
-    if (match(p, "return")) {
-      cur = new_token(TK_KW, cur, p, 6);
-      p += 6;
-      continue;
-    }
-
-    if (match(p, "if")) {
-      cur = new_token(TK_KW, cur, p, 2);
-      p += 2;
-      continue;
-    }
-
-    if (match(p, "else")) {
-      cur = new_token(TK_KW, cur, p, 4);
-      p += 4;
-      continue;
-    }
-
-    if (match(p, "while")) {
-      cur = new_token(TK_KW, cur, p, 5);
-      p += 5;
-      continue;
-    }
-
-    if (match(p, "for")) {
-      cur = new_token(TK_KW, cur, p, 3);
-      p += 3;
-      continue;
-    }
-
-    if (match(p, "long")) {
-      cur = new_token(TK_KW, cur, p, 4);
-      p += 4;
-      continue;
-    }
-
-    if (match(p, "int")) {
-      cur = new_token(TK_KW, cur, p, 3);
-      p += 3;
-      continue;
-    }
-
-    if (match(p, "short")) {
-      cur = new_token(TK_KW, cur, p, 5);
-      p += 5;
-      continue;
-    }
-
-    if (match(p, "char")) {
-      cur = new_token(TK_KW, cur, p, 4);
-      p += 4;
-      continue;
-    }
-
-    if (match(p, "sizeof")) {
-      cur = new_token(TK_KW, cur, p, 6);
-      p += 6;
-      continue;
-    }
-
     if (isalpha(*p)) {
       char *old_p = p;
       p = read_ident(p);
       cur = new_token(TK_IDENT, cur, old_p, p - old_p);
+
+      if (is_keyword(cur))
+        cur->kind = TK_KW;
+
       continue;
     }
 
