@@ -17,7 +17,8 @@
 #define BYTE_SIZE 1
 
 // vector.c
-typedef struct {
+typedef struct
+{
   void **data;
   int len;
   int size;
@@ -30,13 +31,15 @@ void *vec_get(Vector *vec, int idx);
 void *vec_last(Vector *vec);
 
 // map.c
-typedef struct {
+typedef struct
+{
   char *key;
   int keylen;
   void *data;
 } MapEntry;
 
-typedef struct {
+typedef struct
+{
   MapEntry *buckets;
   int size;
   int len;
@@ -57,18 +60,20 @@ char *strndup(const char *s, size_t n);
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 
-typedef enum {
-  TK_PUNC,      // 記号
-  TK_KW,        // 予約語
-  TK_IDENT,     // 識別子
-  TK_NUM,       // 整数
-  TK_STRING,    // 文字列
-  TK_EOF,       // EOF
+typedef enum
+{
+  TK_PUNC,   // 記号
+  TK_KW,     // 予約語
+  TK_IDENT,  // 識別子
+  TK_NUM,    // 整数
+  TK_STRING, // 文字列
+  TK_EOF,    // EOF
 } TokenKind;
 
 typedef struct Token Token;
 
-struct Token {
+struct Token
+{
   TokenKind kind;
   Token *next;
   int val;
@@ -78,7 +83,8 @@ struct Token {
 
 // type.c
 
-typedef enum {
+typedef enum
+{
   TYPE_PTR,
   TYPE_LONG,
   TYPE_INT,
@@ -89,7 +95,8 @@ typedef enum {
 
 typedef struct Type Type;
 
-struct Type {
+struct Type
+{
   TypeKind kind;
   size_t size;
   struct Type *base;
@@ -107,7 +114,8 @@ Type *array_of(Type *base, size_t array_size);
 bool is_integer(Type *type);
 Type *max_type_by_size(Type *ltype, Type *rtype);
 
-typedef struct Var {
+typedef struct Var
+{
   char *name;
   int len;
   int offset;
@@ -115,12 +123,14 @@ typedef struct Var {
   bool is_local;
 } Var;
 
-typedef struct String {
+typedef struct String
+{
   char *name;
   char *string;
 } String;
 
-typedef enum {
+typedef enum
+{
   ND_ADD,
   ND_SUB,
   ND_MUL,
@@ -150,7 +160,8 @@ typedef enum {
 
 typedef struct Node Node;
 
-struct Node {
+struct Node
+{
   NodeKind kind;
   Node *lhs;
   Node *rhs;
@@ -176,7 +187,8 @@ struct Node {
   Vector *lvars;
 };
 
-typedef struct {
+typedef struct
+{
   char *name;
   Type *type;
   Node *node;

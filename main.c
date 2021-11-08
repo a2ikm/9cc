@@ -1,11 +1,15 @@
 #include "9cc.h"
 
-char *read_file(char *path) {
+char *read_file(char *path)
+{
   FILE *fp;
 
-  if (strcmp(path, "-") == 0) {
+  if (strcmp(path, "-") == 0)
+  {
     fp = stdin;
-  } else {
+  }
+  else
+  {
     fp = fopen(path, "r");
     if (!fp)
       error("cannot open %s: %s", path, strerror(errno));
@@ -16,13 +20,15 @@ char *read_file(char *path) {
   char *buf = calloc(1, buflen);
 
   // Read the entire file.
-  for (;;) {
+  for (;;)
+  {
     int end = buflen - 2; // extra 2 bytes for the trailing "\n\0"
     int n = fread(buf + nread, 1, end - nread, fp);
     if (n == 0)
       break;
     nread += n;
-    if (nread == end) {
+    if (nread == end)
+    {
       buflen *= 2;
       buf = realloc(buf, buflen);
     }
@@ -39,8 +45,10 @@ char *read_file(char *path) {
   return buf;
 }
 
-int main(int argc, char **argv) {
-  if (argc != 2) {
+int main(int argc, char **argv)
+{
+  if (argc != 2)
+  {
     fprintf(stderr, "引数の個数が正しくありません\n");
     return 1;
   }

@@ -1,6 +1,7 @@
 #include "9cc.h"
 
-typedef struct Env {
+typedef struct Env
+{
   Map *vars;
   struct Env *prev;
 } Env;
@@ -8,14 +9,16 @@ typedef struct Env {
 Env *env;
 Vector *lvars;
 
-Env *new_env(Env *prev) {
+Env *new_env(Env *prev)
+{
   Env *env = calloc(1, sizeof(Env));
   env->vars = map_new();
   env->prev = prev;
   return env;
 }
 
-Var *new_var(Token *tok, Type *type) {
+Var *new_var(Token *tok, Type *type)
+{
   Var *var = calloc(1, sizeof(Var));
   var->name = strndup(tok->str, tok->len);
   var->len = tok->len;
@@ -23,17 +26,21 @@ Var *new_var(Token *tok, Type *type) {
   return var;
 }
 
-Var *find_var(Token *tok) {
-  for (Env *e = env; e; e = e->prev) {
+Var *find_var(Token *tok)
+{
+  for (Env *e = env; e; e = e->prev)
+  {
     Var *var = map_get2(e->vars, tok->str, tok->len);
-    if (var) {
+    if (var)
+    {
       return var;
     }
   }
   return NULL;
 }
 
-Var *new_lvar(Token *tok, Type *type) {
+Var *new_lvar(Token *tok, Type *type)
+{
   Var *lvar = new_var(tok, type);
   lvar->is_local = true;
 
@@ -48,7 +55,8 @@ Var *new_lvar(Token *tok, Type *type) {
   return lvar;
 }
 
-Var *new_gvar(Token *tok, Type *type) {
+Var *new_gvar(Token *tok, Type *type)
+{
   Var *gvar = new_var(tok, type);
   gvar->is_local = false;
 
@@ -57,9 +65,11 @@ Var *new_gvar(Token *tok, Type *type) {
   return gvar;
 }
 
-String *new_string(Token *tok) {
+String *new_string(Token *tok)
+{
   String *string = map_get2(strings, tok->str, tok->len);
-  if (string) {
+  if (string)
+  {
     return string;
   }
 
@@ -70,8 +80,10 @@ String *new_string(Token *tok) {
   return string;
 }
 
-Function *find_func(Token *tok) {
-  for (int i = 0; i < vec_len(funcs); i++) {
+Function *find_func(Token *tok)
+{
+  for (int i = 0; i < vec_len(funcs); i++)
+  {
     Function *fn = vec_get(funcs, i);
     if (!memcmp(tok->str, fn->name, tok->len))
       return fn;
@@ -79,38 +91,44 @@ Function *find_func(Token *tok) {
   return NULL;
 }
 
-bool equal(Token *tok, char *op) {
+bool equal(Token *tok, char *op)
+{
   return strlen(op) == tok->len && memcmp(tok->str, op, tok->len) == 0;
 }
 
-Token *advance() {
+Token *advance()
+{
   Token *tok = token;
   token = token->next;
   return tok;
 }
 
-Token *consume(char *op) {
+Token *consume(char *op)
+{
   if (equal(token, op))
     return advance();
 
   return NULL;
 }
 
-Token *consume_kind(TokenKind kind) {
+Token *consume_kind(TokenKind kind)
+{
   if (token->kind == kind)
     return advance();
 
   return NULL;
 }
 
-void expect(char *op) {
+void expect(char *op)
+{
   if (equal(token, op))
     advance();
   else
     error_at(token->str, "'%s'ではありません", op);
 }
 
-int expect_num() {
+int expect_num()
+{
   if (token->kind == TK_NUM)
     return advance()->val;
 
@@ -118,7 +136,8 @@ int expect_num() {
   unreachable();
 }
 
-Token *expect_kind(TokenKind kind) {
+Token *expect_kind(TokenKind kind)
+{
   if (token->kind == kind)
     return advance();
 
@@ -126,14 +145,16 @@ Token *expect_kind(TokenKind kind) {
   unreachable();
 }
 
-bool is_type_name(Token *tok) {
+bool is_type_name(Token *tok)
+{
   return equal(tok, "long") ||
-    (equal(tok, "int")) ||
-    (equal(tok, "short")) ||
-    (equal(tok, "char"));
+         (equal(tok, "int")) ||
+         (equal(tok, "short")) ||
+         (equal(tok, "char"));
 }
 
-Type *detect_type() {
+Type *detect_type()
+{
   if (consume("long"))
     return long_type;
   else if (consume("int"))
@@ -146,45 +167,52 @@ Type *detect_type() {
     return NULL;
 }
 
-bool at_eof() {
+bool at_eof()
+{
   return token->kind == TK_EOF;
 }
 
-Node *new_node(NodeKind kind) {
+Node *new_node(NodeKind kind)
+{
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
   return node;
 }
 
-Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
+Node *new_binary(NodeKind kind, Node *lhs, Node *rhs)
+{
   Node *node = new_node(kind);
   node->lhs = lhs;
   node->rhs = rhs;
   return node;
 }
 
-Node *new_num(int val) {
+Node *new_num(int val)
+{
   Node *node = new_node(ND_NUM);
   node->val = val;
   node->type = int_type;
   return node;
 }
 
-Node *new_unary(NodeKind kind, Node *expr) {
+Node *new_unary(NodeKind kind, Node *expr)
+{
   Node *node = new_node(kind);
   node->lhs = expr;
   node->rhs = NULL;
   return node;
 }
 
-Node *new_var_node(Var *var) {
+Node *new_var_node(Var *var)
+{
   Node *node = new_node(ND_VAR);
   node->var = var;
   node->type = var->type;
   return node;
 }
 
-Node *num() {
+Node *num()
+{
   return new_num(expect_num());
 }
 
@@ -192,8 +220,10 @@ Node *expr();
 Node *new_add(Node *lhs, Node *rhs);
 Node *compound_stmt();
 
-Node *primary() {
-  if (consume("(")) {
+Node *primary()
+{
+  if (consume("("))
+  {
     Node *node = expr();
     expect(")");
     return node;
@@ -201,10 +231,13 @@ Node *primary() {
 
   Token *tok = NULL;
 
-  if (tok = consume_kind(TK_IDENT)) {
-    if (consume("(")) {
+  if (tok = consume_kind(TK_IDENT))
+  {
+    if (consume("("))
+    {
       Function *fn = find_func(tok);
-      if (!fn) {
+      if (!fn)
+      {
         error_at(tok->str, "Calling unknown function");
       }
 
@@ -214,7 +247,8 @@ Node *primary() {
       node->args = vec_new();
 
       // parse args
-      while (!consume(")")) {
+      while (!consume(")"))
+      {
         vec_add(node->args, expr());
         if (consume(","))
           continue;
@@ -223,17 +257,23 @@ Node *primary() {
       }
 
       return node;
-    } else {
+    }
+    else
+    {
       Var *var;
       Node *node;
 
-      if (var = find_var(tok)) {
+      if (var = find_var(tok))
+      {
         node = new_var_node(var);
-      } else {
+      }
+      else
+      {
         error_at(tok->str, "Unknown variable");
       }
 
-      if (consume("[")) {
+      if (consume("["))
+      {
         node = new_add(node, expr());
         node->type = node->lhs->type;
         expect("]");
@@ -246,7 +286,8 @@ Node *primary() {
     }
   }
 
-  if (tok = consume_kind(TK_STRING)) {
+  if (tok = consume_kind(TK_STRING))
+  {
     String *string = new_string(tok);
     Node *node = new_node(ND_STRING);
     node->string = string;
@@ -264,95 +305,128 @@ Node *primary() {
 //       | "sizeof" "(" type-name ")"
 //       | "sizeof" unary
 //       | primary
-Node *unary() {
+Node *unary()
+{
   if (consume("+"))
     return primary();
-  if (consume("-")) {
+  if (consume("-"))
+  {
     Node *node = new_binary(ND_SUB, new_num(0), primary());
     node->type = node->rhs->type;
     return node;
   }
-  if (consume("*")) {
+  if (consume("*"))
+  {
     Node *node = new_unary(ND_DEREF, unary());
     node->type = node->lhs->type->base;
     return node;
   }
-  if (consume("&")) {
+  if (consume("&"))
+  {
     Node *node = new_unary(ND_ADDR, unary());
     node->type = pointer_to(node->lhs->type);
     return node;
   }
-  if (consume("sizeof")) {
-    if (equal(token, "(") && is_type_name(token->next)) {
+  if (consume("sizeof"))
+  {
+    if (equal(token, "(") && is_type_name(token->next))
+    {
       consume("(");
       Node *node = new_num(detect_type()->size);
       expect(")");
       return node;
-    } else {
+    }
+    else
+    {
       return new_num(unary()->type->size);
     }
   }
   return primary();
 }
 
-Node *mul() {
+Node *mul()
+{
   Node *node = unary();
 
-  for (;;) {
-    if (consume("*")) {
+  for (;;)
+  {
+    if (consume("*"))
+    {
       node = new_binary(ND_MUL, node, unary());
       node->type = max_type_by_size(node->lhs->type, node->rhs->type);
-    } else if (consume("/")) {
+    }
+    else if (consume("/"))
+    {
       node = new_binary(ND_DIV, node, unary());
       node->type = node->lhs->type;
-    } else {
+    }
+    else
+    {
       return node;
     }
   }
 }
 
-Node *new_add(Node *lhs, Node *rhs) {
+Node *new_add(Node *lhs, Node *rhs)
+{
   Node *node;
 
-  if (is_integer(lhs->type) && is_integer(rhs->type)) {
+  if (is_integer(lhs->type) && is_integer(rhs->type))
+  {
     node = new_binary(ND_ADD, lhs, rhs);
     node->type = max_type_by_size(lhs->type, rhs->type);
-  } else if (is_integer(lhs->type)) {
+  }
+  else if (is_integer(lhs->type))
+  {
     node = new_binary(ND_PTR_ADD, rhs, lhs);
     node->type = rhs->type;
-  } else if (is_integer(rhs->type)) {
+  }
+  else if (is_integer(rhs->type))
+  {
     node = new_binary(ND_PTR_ADD, lhs, rhs);
     node->type = lhs->type;
-  } else {
+  }
+  else
+  {
     error("kind mismatch: lhs=%d rhs=%d", lhs->type->kind, rhs->type->kind);
   }
 
   return node;
 }
 
-Node *new_sub(Node *lhs, Node *rhs) {
+Node *new_sub(Node *lhs, Node *rhs)
+{
   Node *node;
 
-  if (is_integer(lhs->type) && is_integer(rhs->type)) {
+  if (is_integer(lhs->type) && is_integer(rhs->type))
+  {
     node = new_binary(ND_SUB, lhs, rhs);
     node->type = max_type_by_size(lhs->type, rhs->type);
-  } else if (is_integer(rhs->type)) {
+  }
+  else if (is_integer(rhs->type))
+  {
     node = new_binary(ND_PTR_SUB, lhs, rhs);
     node->type = lhs->type;
-  } else if (lhs->type->kind == TYPE_PTR) {
+  }
+  else if (lhs->type->kind == TYPE_PTR)
+  {
     node = new_binary(ND_PTR_DIFF, lhs, rhs);
     node->type = int_type;
-  } else {
+  }
+  else
+  {
     error("kind mismatch: lhs=%d rhs=%d", lhs->type->kind, rhs->type->kind);
   }
 
   return node;
 }
 
-Node *add() {
+Node *add()
+{
   Node *node = mul();
 
-  for (;;) {
+  for (;;)
+  {
     if (consume("+"))
       node = new_add(node, mul());
     else if (consume("-"))
@@ -362,36 +436,52 @@ Node *add() {
   }
 }
 
-Node *relational() {
+Node *relational()
+{
   Node *node = add();
 
-  for (;;) {
-    if (consume("<")) {
+  for (;;)
+  {
+    if (consume("<"))
+    {
       node = new_binary(ND_LT, node, add());
       node->type = int_type;
-    } else if (consume("<=")) {
+    }
+    else if (consume("<="))
+    {
       node->type = int_type;
       node = new_binary(ND_LTEQ, node, add());
-    } else if (consume(">")) {
+    }
+    else if (consume(">"))
+    {
       node->type = int_type;
       node = new_binary(ND_LT, add(), node);
-    } else if (consume(">=")) {
+    }
+    else if (consume(">="))
+    {
       node->type = int_type;
       node = new_binary(ND_LTEQ, add(), node);
-    } else {
+    }
+    else
+    {
       return node;
     }
   }
 }
 
-Node *equality() {
+Node *equality()
+{
   Node *node = relational();
 
-  for (;;) {
-    if (consume("==")) {
+  for (;;)
+  {
+    if (consume("=="))
+    {
       node = new_binary(ND_EQ, node, relational());
       node->type = int_type;
-    } else if (consume("!=")) {
+    }
+    else if (consume("!="))
+    {
       node = new_binary(ND_NEQ, node, relational());
       node->type = int_type;
     }
@@ -401,9 +491,11 @@ Node *equality() {
 }
 
 // assign = equality ("=" assign)?
-Node *assign() {
+Node *assign()
+{
   Node *node = equality();
-  if (consume("=")) {
+  if (consume("="))
+  {
     node = new_binary(ND_ASSIGN, node, assign());
     node->type = node->lhs->type;
   }
@@ -411,12 +503,14 @@ Node *assign() {
 }
 
 // expr = assign
-Node *expr() {
+Node *expr()
+{
   return assign();
 }
 
 // expr-stmt = expr? ";"
-Node *expr_stmt() {
+Node *expr_stmt()
+{
   Node *node = new_unary(ND_EXPR_STMT, expr());
   expect(";");
   return node;
@@ -428,11 +522,13 @@ Node *expr_stmt() {
 //      | "{" compound-stmt
 //      | "return" expr ";"
 //      | expr-stmt
-Node *stmt() {
+Node *stmt()
+{
   Node *node;
 
   // end with stmt
-  if (consume("if")) {
+  if (consume("if"))
+  {
     Node *node = new_node(ND_IF);
     expect("(");
     node->condition = expr();
@@ -441,14 +537,18 @@ Node *stmt() {
     if (consume("else"))
       node->alternative = stmt();
     return node;
-  } else if (consume("while")) {
+  }
+  else if (consume("while"))
+  {
     Node *node = new_node(ND_WHILE);
     expect("(");
     node->condition = expr();
     expect(")");
     node->consequence = stmt();
     return node;
-  } else if (consume("for")) {
+  }
+  else if (consume("for"))
+  {
     Node *node = new_node(ND_FOR);
     expect("(");
     node->initialization = expr();
@@ -459,9 +559,13 @@ Node *stmt() {
     expect(")");
     node->consequence = stmt();
     return node;
-  } else if (consume("{")) {
+  }
+  else if (consume("{"))
+  {
     return compound_stmt();
-  } else if (consume("return")) {
+  }
+  else if (consume("return"))
+  {
     Node *node = new_unary(ND_RETURN, expr());
     expect(";");
     return node;
@@ -470,20 +574,25 @@ Node *stmt() {
   return expr_stmt();
 }
 
-Node *lvar_initializer(Var *var) {
+Node *lvar_initializer(Var *var)
+{
   Node *node = new_var_node(var);
 
-  if (consume("{")) {
+  if (consume("{"))
+  {
     Vector *exprs = vec_new();
 
     int i = 0;
     bool closed = false;
-    while(!at_eof()) {
-      if (consume("}")) {
+    while (!at_eof())
+    {
+      if (consume("}"))
+      {
         closed = true;
         break;
       }
-      if (i > 0) {
+      if (i > 0)
+      {
         expect(",");
       }
 
@@ -491,22 +600,30 @@ Node *lvar_initializer(Var *var) {
       i++;
     }
 
-    if (!closed) {
+    if (!closed)
+    {
       expect("}");
     }
 
-    if (var->type->array_size == -1) {
+    if (var->type->array_size == -1)
+    {
       var->type = array_of(var->type->base, vec_len(exprs));
-    } else if (var->type->array_size < vec_len(exprs)) {
+    }
+    else if (var->type->array_size < vec_len(exprs))
+    {
       error_at(token->str, "Too many initializers");
-    } else {
-      for (; vec_len(exprs) < var->type->array_size;) {
+    }
+    else
+    {
+      for (; vec_len(exprs) < var->type->array_size;)
+      {
         vec_add(exprs, new_num(0));
       }
     }
 
     Vector *stmts = vec_new();
-    for (int j = 0; j < vec_len(exprs); j++) {
+    for (int j = 0; j < vec_len(exprs); j++)
+    {
       Node *init = new_add(node, new_num(j));
       init->type = init->lhs->type;
       init = new_unary(ND_DEREF, init);
@@ -521,7 +638,9 @@ Node *lvar_initializer(Var *var) {
 
     node = new_node(ND_BLOCK);
     node->stmts = stmts;
-  } else {
+  }
+  else
+  {
     node = new_binary(ND_ASSIGN, node, assign());
     node->type = node->lhs->type;
     node = new_unary(ND_EXPR_STMT, node);
@@ -530,29 +649,37 @@ Node *lvar_initializer(Var *var) {
   return node;
 }
 
-Node *declaration(Type *type) {
+Node *declaration(Type *type)
+{
   Node *node = NULL;
   Var *var = NULL;
 
-  while (!at_eof()) {
-    if (consume("*")) {
+  while (!at_eof())
+  {
+    if (consume("*"))
+    {
       type = pointer_to(type);
       continue;
     }
     break;
   }
   Token *tok = expect_kind(TK_IDENT);
-  if (consume("[")) {
-    if (token->kind == TK_NUM) {
+  if (consume("["))
+  {
+    if (token->kind == TK_NUM)
+    {
       type = array_of(type, expect_num());
-    } else {
+    }
+    else
+    {
       type = array_of(type, -1);
     }
     expect("]");
   }
 
   var = new_lvar(tok, type);
-  if (consume("=")) {
+  if (consume("="))
+  {
     node = lvar_initializer(var);
   }
 
@@ -562,18 +689,23 @@ Node *declaration(Type *type) {
 }
 
 // compound-stmt = (declaration | stmt)* "}"
-Node *compound_stmt() {
+Node *compound_stmt()
+{
   Node *node = new_node(ND_BLOCK);
   node->stmts = vec_new();
-  while(!at_eof()) {
+  while (!at_eof())
+  {
     if (consume("}"))
       break;
     Type *type = detect_type();
-    if (type) {
+    if (type)
+    {
       Node *init = declaration(type);
       if (init)
         vec_add(node->stmts, init);
-    } else {
+    }
+    else
+    {
       vec_add(node->stmts, stmt());
     }
   }
@@ -582,13 +714,16 @@ Node *compound_stmt() {
 
 // func = typename ident "(" (typename ident ("," typename ident)*)? ")" "{" compound-stmt
 //      | typename ident "(" (typename ident ("," typename ident)*)? ")" ";"
-void func() {
+void func()
+{
   Type *type = detect_type();
   if (!type)
     error_at(token->str, "Type detection failure");
 
-  while (!at_eof()) {
-    if (consume("*")) {
+  while (!at_eof())
+  {
+    if (consume("*"))
+    {
       type = pointer_to(type);
       continue;
     }
@@ -596,9 +731,11 @@ void func() {
   }
   Token *tok = expect_kind(TK_IDENT);
 
-  if (consume("(")) {
+  if (consume("("))
+  {
     Function *fn = find_func(tok);
-    if (!fn) {
+    if (!fn)
+    {
       fn = calloc(1, sizeof(Function));
       fn->name = strndup(tok->str, tok->len);
       fn->type = type;
@@ -608,13 +745,17 @@ void func() {
     // parse params
     Vector *params = vec_new();
     lvars = vec_new();
-    if (!consume(")")) {
-      while (!at_eof()) {
+    if (!consume(")"))
+    {
+      while (!at_eof())
+      {
         Type *type = detect_type();
         if (!type)
           error_at(token->str, "Type detection failure");
-        while (!at_eof()) {
-          if (consume("*")) {
+        while (!at_eof())
+        {
+          if (consume("*"))
+          {
             type = pointer_to(type);
             continue;
           }
@@ -642,8 +783,11 @@ void func() {
 
     expect("{");
     node->stmts = compound_stmt()->stmts;
-  } else {
-    if (consume("[")) {
+  }
+  else
+  {
+    if (consume("["))
+    {
       int array_size = expect_num();
       type = array_of(type, array_size);
       expect("]");
@@ -654,12 +798,14 @@ void func() {
   }
 }
 
-void program() {
+void program()
+{
   while (!at_eof())
     func();
 }
 
-void parse() {
+void parse()
+{
   env = new_env(NULL);
   program();
 }

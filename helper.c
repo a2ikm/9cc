@@ -1,19 +1,22 @@
 #include "9cc.h"
 
 // Copied from https://stackoverflow.com/a/46013943/1074991
-char *strndup(const char *s, size_t n) {
+char *strndup(const char *s, size_t n)
+{
   char *p = memchr(s, '\0', n);
   if (p != NULL)
     n = p - s;
   p = malloc(n + 1);
-  if (p != NULL) {
+  if (p != NULL)
+  {
     memcpy(p, s, n);
     p[n] = '\0';
   }
   return p;
 }
 
-void error(char *fmt, ...) {
+void error(char *fmt, ...)
+{
   va_list ap;
   va_start(ap, fmt);
 
@@ -22,7 +25,8 @@ void error(char *fmt, ...) {
   exit(1);
 }
 
-void error_at(char *loc, char *fmt, ...) {
+void error_at(char *loc, char *fmt, ...)
+{
   va_list ap;
   va_start(ap, fmt);
 

@@ -1,3 +1,4 @@
+// clang-format off
 #include "test.h"
 
 char add(char x, char y) {
