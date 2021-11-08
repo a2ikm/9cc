@@ -209,6 +209,7 @@ void tokenize();
 void parse();
 
 // codegen.c
+void emit_syntax();
 void emit_bss();
 void emit_data();
 void emit_text();

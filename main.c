@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   tokenize();
   parse();
 
-  printf("  .intel_syntax noprefix\n");
+  emit_syntax();
   emit_bss();
   emit_data();
   emit_text();

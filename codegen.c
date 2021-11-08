@@ -317,6 +317,11 @@ void gen_gvar(Var *gvar)
   println("  .zero %ld", gvar->type->size);
 }
 
+void emit_syntax()
+{
+  printf("  .intel_syntax noprefix\n");
+}
+
 void emit_bss()
 {
   if (vec_len(gvars) == 0)
