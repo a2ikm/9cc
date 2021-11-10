@@ -412,3 +412,11 @@ void emit_text()
       gen(fn->node);
   }
 }
+
+void emit_amd64()
+{
+  emit_syntax();
+  emit_bss();
+  emit_data();
+  emit_text();
+}

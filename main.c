@@ -47,7 +47,7 @@ char *read_file(char *path)
 
 int main(int argc, char **argv)
 {
-  if (argc != 2)
+  if (argc < 2)
   {
     fprintf(stderr, "引数の個数が正しくありません\n");
     return 1;
@@ -64,10 +64,14 @@ int main(int argc, char **argv)
   tokenize();
   parse();
 
-  emit_syntax();
-  emit_bss();
-  emit_data();
-  emit_text();
+  if (argc == 2)
+  {
+    emit_amd64();
+  }
+  else
+  {
+    emit_arm64();
+  }
 
   return 0;
 }

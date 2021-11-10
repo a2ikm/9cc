@@ -209,10 +209,8 @@ void tokenize();
 void parse();
 
 // codegen.c
-void emit_syntax();
-void emit_bss();
-void emit_data();
-void emit_text();
+void emit_amd64();
+void emit_arm64();
 
 #define unreachable() error("unreachable %s:%d", __FILE__, __LINE__)
 
