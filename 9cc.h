@@ -194,13 +194,13 @@ typedef struct
   Node *node;
 } Function;
 
-Vector *funcs;
-Vector *gvars;
-Map *strings;
+extern Vector *funcs;
+extern Vector *gvars;
+extern Map *strings;
 
-Token *token;
-char *user_input;
-char *filename;
+extern Token *token;
+extern char *user_input;
+extern char *filename;
 
 // tokenize.c
 void tokenize();

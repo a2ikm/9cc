@@ -1,5 +1,11 @@
 #include "9cc.h"
 
+Vector *funcs;
+Vector *gvars;
+Map *strings;
+char *user_input;
+char *filename;
+
 char *read_file(char *path)
 {
   FILE *fp;

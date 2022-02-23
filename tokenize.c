@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+Token *token;
+
 Token *new_token(TokenKind kind, Token *cur, char *str, int len)
 {
   Token *tok = calloc(1, sizeof(Token));
