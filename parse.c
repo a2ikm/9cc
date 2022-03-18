@@ -145,6 +145,7 @@ bool is_type_name(Token *tok)
   return equal(tok, "long") ||
          (equal(tok, "int")) ||
          (equal(tok, "short")) ||
+         (equal(tok, "unsigned")) ||
          (equal(tok, "char"));
 }
 
@@ -156,6 +157,8 @@ Type *detect_type()
     return int_type;
   else if (consume("short"))
     return short_type;
+  else if (consume("unsigned"))
+    return uint_type;
   else if (consume("char"))
     return char_type;
   else

@@ -1,9 +1,14 @@
 #include "9cc.h"
 
-Type *long_type = &(Type){TYPE_LONG, QWORD_SIZE, NULL};
-Type *int_type = &(Type){TYPE_INT, DWORD_SIZE, NULL};
-Type *short_type = &(Type){TYPE_SHORT, WORD_SIZE, NULL};
-Type *char_type = &(Type){TYPE_CHAR, BYTE_SIZE, NULL};
+Type *long_type = &(Type){TYPE_LONG, QWORD_SIZE, false};
+Type *int_type = &(Type){TYPE_INT, DWORD_SIZE, false};
+Type *short_type = &(Type){TYPE_SHORT, WORD_SIZE, false};
+
+Type *ulong_type = &(Type){TYPE_LONG, QWORD_SIZE, true};
+Type *uint_type = &(Type){TYPE_INT, DWORD_SIZE, true};
+Type *ushort_type = &(Type){TYPE_SHORT, WORD_SIZE, true};
+
+Type *char_type = &(Type){TYPE_CHAR, BYTE_SIZE, false};
 
 Type *new_type(TypeKind kind)
 {

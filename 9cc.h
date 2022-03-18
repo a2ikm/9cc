@@ -99,6 +99,7 @@ struct Type
 {
   TypeKind kind;
   size_t size;
+  bool is_unsigned;
   struct Type *base;
   size_t array_size;
 };
@@ -106,9 +107,13 @@ struct Type
 extern Type *long_type;
 extern Type *int_type;
 extern Type *short_type;
+
+extern Type *ulong_type;
+extern Type *uint_type;
+extern Type *ushort_type;
+
 extern Type *char_type;
 
-Type *new_type(TypeKind kind);
 Type *pointer_to(Type *base);
 Type *array_of(Type *base, size_t array_size);
 bool is_integer(Type *type);

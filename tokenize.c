@@ -45,6 +45,7 @@ bool is_keyword(Token *tok)
          equal(tok, "long") ||
          equal(tok, "int") ||
          equal(tok, "short") ||
+         equal(tok, "unsigned") ||
          equal(tok, "char");
 }
 

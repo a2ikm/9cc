@@ -5,6 +5,7 @@ int main() {
   ASSERT(8, sizeof(long));
   ASSERT(4, sizeof(int));
   ASSERT(2, sizeof(short));
+  ASSERT(4, sizeof(unsigned));
   ASSERT(1, sizeof(char));
 
   long long42 = 42;
@@ -18,6 +19,10 @@ int main() {
   short short42 = 42;
   ASSERT(42, short42);
   ASSERT(2, sizeof(short42));
+
+  unsigned unsigned42 = 42;
+  ASSERT(42, unsigned42);
+  ASSERT(4, sizeof(unsigned42));
 
   char char42 = 42;
   ASSERT(42, char42);
