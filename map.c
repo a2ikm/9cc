@@ -123,7 +123,7 @@ Map *map_new()
   Map *map = malloc(sizeof(Map));
   map->len = 0;
   map->size = INITIAL_SIZE;
-  map->buckets = malloc(sizeof(MapEntry) * map->size);
+  map->buckets = calloc(map->size, sizeof(MapEntry));
   return map;
 }
 
