@@ -91,11 +91,6 @@ Function *find_func(Token *tok)
   return NULL;
 }
 
-bool equal(Token *tok, char *op)
-{
-  return strlen(op) == tok->len && memcmp(tok->str, op, tok->len) == 0;
-}
-
 Token *advance()
 {
   Token *tok = token;

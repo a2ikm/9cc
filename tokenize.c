@@ -36,30 +36,16 @@ bool is_alnum(char c)
 
 bool is_keyword(Token *tok)
 {
-  static Map *map = NULL;
-
-  if (!map)
-  {
-    map = map_new();
-    char *kw[] = {
-        "return",
-        "if",
-        "else",
-        "while",
-        "for",
-        "sizeof",
-        "long",
-        "int",
-        "short",
-        "char",
-    };
-    for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++)
-    {
-      map_put(map, kw[i], (void *)1);
-    }
-  }
-
-  return map_get2(map, tok->str, tok->len);
+  return equal(tok, "return") ||
+         equal(tok, "if") ||
+         equal(tok, "else") ||
+         equal(tok, "while") ||
+         equal(tok, "for") ||
+         equal(tok, "sizeof") ||
+         equal(tok, "long") ||
+         equal(tok, "int") ||
+         equal(tok, "short") ||
+         equal(tok, "char");
 }
 
 void tokenize()

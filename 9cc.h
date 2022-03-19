@@ -202,6 +202,9 @@ extern Token *token;
 extern char *user_input;
 extern char *filename;
 
+// util.c
+bool equal(Token *tok, char *str);
+
 // tokenize.c
 void tokenize();
 
